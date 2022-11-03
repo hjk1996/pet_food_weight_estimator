@@ -56,7 +56,7 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 ```
 
 
-훈련에서 설정할 수 있는 파라미터는 다음과 같습니다.
+  훈련에서 설정할 수 있는 파라미터는 다음과 같습니다.
 
 
 |파라미터|설명|기본값|
