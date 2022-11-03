@@ -97,4 +97,4 @@ tensorboard --logdir=results/2022-11-03_10-37-07/log
 
 $MAE=1n∑i=1n|yi−y^i|$
 
-
+$frac{1}{n}\sum_{i=1}^{n}|x_i-y_i|$
