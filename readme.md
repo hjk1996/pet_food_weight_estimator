@@ -18,13 +18,15 @@ pip install -r requirements.txt
 
 1. 수집한 이미지에 대한 메타 데이터를 담고 있는 image_meta_data.csv 파일을 생성합니다.  
 image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.  
-  
+
+
 |칼럼 이름|내용|예시|
 |------|---|---|
 |bowl_type|사료 용기 종류 (0부터 시작)|0|
 |food_type|사료 종류 (0부터 시작)|3|
 |gram|사료 무게|20|
 |image_name|이미지 이름|image1.jpg|
+  
   
 2. 훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와   
 개별 이미지에 대한 정보를 담고 있는 image_meta_data.csv 파일을 data 폴더에 배치합니다.
@@ -45,6 +47,7 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
       └───image_meta_data.csv
   ```
 
+
 3. 명령어를 입력해 훈련 및 평가를 실시합니다.
 
 ```
@@ -52,7 +55,9 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
 python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 ```
 
+
 훈련에서 설정할 수 있는 파라미터는 다음과 같습니다.
+
 
 |파라미터|설명|기본값|
 |------|---|---|
