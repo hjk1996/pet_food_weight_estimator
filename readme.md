@@ -14,6 +14,7 @@ pip install -r requirements.txt
 
 
 ## 모델 훈련
+---
 
 0. 수집한 이미지에 대한 메타 데이터를 담고 있는 image_meta_data.csv 파일을 생성합니다.  
 image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.  
