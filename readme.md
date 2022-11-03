@@ -15,4 +15,20 @@ pip install -r requirements.txt
 
 # 모델 훈련
 
-1. 모델을 훈련하기 위해서는 데이터를 먼저 세팅해야 합니다.
+1. 모델을 훈련하기 위해서는 데이터를 먼저 세팅해야 합니다. 훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와 개별 이미지에 대한 정보를 담고 있는 image_meta_data.csv 파일을 data 폴더에 배치합니다.
+```
+root
+│   
+│   
+└───data
+    │   
+    │   
+    └───images
+    │   │   
+    │   │   
+    │   └───image1.jpg
+    │   └───image2.jpg
+    │       ...
+    │
+    └───image_meta_data.csv
+```
