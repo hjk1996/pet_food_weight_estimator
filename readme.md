@@ -29,6 +29,7 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
 훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와   
 개별 이미지에 대한 정보를 담고 있는 image_meta_data.csv 파일을 data 폴더에 배치합니다.
   ```
+  #example
   root
   │   
   │   
@@ -80,9 +81,11 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
   ```
 ### 3. 결과 확인
 
-tensorboard를 통해 학습 결과를 확인할 수 있습니다.
+tensorboard를 통해 학습 결과를 확인할 수 있습니다.  
+다음 명령어를 실행한 뒤 제공하는 URL로 이동하거나 http://localhost:6006/ 로 이동해 학습 결과를 확인합니다.
 ```
-tensorboard --logdir=results/
+#example
+tensorboard --logdir=results/2022-11-03_10-37-07/log
 ```
 
 
