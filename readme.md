@@ -56,6 +56,7 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 |------|---|---|
 |epoch|훈련 epoch 수|1000|
 |batch_size|데이터셋 batch 크기|32|
+|resize|리사이즈 이후 이미지의 너비와 높이, 학습 단계에서는 학습 속도를 위해 사용하지 않고 미리 모델의 인풋에 맞게 리사이징 된 이미지를 사용하는 것을 권장함|None|
 |hidden_size|FC 레이어 유닛 수|768|
 |classification|사료 종류 학습 여부, False로 설정하면 사료 중량만 학습하고 사료 종류는 학습하지 않음|True|
 |n_classes|사료 종류 수, 사료 종류 분류 학습할 경우 입력 필수|21|

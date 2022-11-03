@@ -1,14 +1,12 @@
 import os
+from typing import Tuple
 
 import pandas as pd
 import torch
 import torch
 from torchvision.transforms import Resize
-from torchvision import transforms, models
 from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader
-import torchvision.transforms as T
-from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import train_test_split
 
 
@@ -20,11 +18,13 @@ class CustomDataset(Dataset):
         n_classes: int,
         device: torch.device,
         transform=None,
+        resize: Tuple[int, int] = None
     ):
         self.meta_data = meta_data
         self.img_dir = img_dir
         self.transform = transform
         self.n_classes = n_classes
+        self.resizer = Resize(resize) if resize else None
         self.device = device
 
     def __len__(self):
@@ -41,14 +41,12 @@ class CustomDataset(Dataset):
 
         if self.transform:
             img = self.transform(img)
+        if self.resizer:
+            img = self.resizer(img)
 
         img = img.type(torch.FloatTensor) / 255.0
 
         return weight.to(self.device), food_type.to(self.device), img.to(self.device)
-
-
-# def load_meta_data(path: str) -> pd.DataFrame:
-#     return pd.read_csv(path)[["food_type", "gram", "image_name", "hash"]]
 
 
 def load_meta_data(path: str) -> pd.DataFrame:
@@ -74,6 +72,7 @@ def make_dataloaders(
     test_size: float,
     batch_size: int,
     transform=None,
+    resize: Tuple[int, int]=None,
     random_state: int = 1234,
 ) -> dict:
     meta_data = load_meta_data(meta_data_path)
@@ -87,9 +86,9 @@ def make_dataloaders(
     train = train[:100]
     test = test[:100]
     train_dataset = CustomDataset(
-        train, img_dir, n_classes, device, transform=transform
+        train, img_dir, n_classes, device, transform=transform, resize=resize
     )
-    test_dataset = CustomDataset(test, img_dir, n_classes, device)
+    test_dataset = CustomDataset(test, img_dir, n_classes, device, resize=resize)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
