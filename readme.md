@@ -94,7 +94,3 @@ tensorboard --logdir=results/2022-11-03_10-37-07/log
 |mae|중량 예측 오차(평균 절대 오차)|
 |acc|사료 종류 분류 정확도|
 
-
-$MAE=1n∑i=1n|yi−y^i|$
-
-$MAE=\frac{1}{n}\sum_{i=1}^{n}|x_i-y_i|$
