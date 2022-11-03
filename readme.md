@@ -59,7 +59,7 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 |------|---|---|
 |epoch|훈련 epoch 수|1000|
 |batch_size|데이터셋 batch 크기|32|
-|hidden_size|FC layer 히든 레이어 유닛 수|768|
+|hidden_size|FC 레이어 유닛 수|768|
 |classification|사료 종류 학습 여부, False로 설정하면 사료 중량만 학습하고 사료 종류는 학습하지 않음|True|
 |n_classes|사료 종류 수, 사료 종류 분류 학습할 경우 입력 필수|21|
 |test_size|전체 데이터셋에서 평가 데이터셋 비중|0.2|
@@ -87,5 +87,10 @@ tensorboard를 통해 학습 결과를 확인할 수 있습니다.
 #example
 tensorboard --logdir=results/2022-11-03_10-37-07/log
 ```
+
+|지표|설명|
+|------|---|
+|total_loss|Binary Cross Entropy + MAE|
+|mae|중량 예측 오차 $MAE=1n∑i=1n|yi−y^i|$|
 
 
