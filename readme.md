@@ -5,8 +5,11 @@
 ```
 git clone https://github.com/hjk1996/pet_food_weight_estimator.git
 ```  
-2. 컴퓨터 환경에 적합한 pytorch를 설치합니다.
+
+
+2. 컴퓨터 환경에 적합한 pytorch를 설치합니다.  
 https://pytorch.org/get-started/locally/  
+
 
 3. 나머지 dependency를 설치합니다.
 ```
