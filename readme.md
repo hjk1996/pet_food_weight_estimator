@@ -4,7 +4,7 @@
 1. 파이썬 가상환경(3.7.13)을 생성한 뒤 repository를 clone합니다.
 ```
 git clone https://github.com/hjk1996/pet_food_weight_estimator.git
-```  
+```
   
   
 2. 모델의 dependency를 설치합니다.
@@ -48,7 +48,7 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
   ```
 
 
-3. 명령어를 입력해 훈련 및 평가를 실시합니다.
+3. 명령어를 입력해 훈련 및 평가를 실시합니다.  
 
 ```
 # example
@@ -56,8 +56,7 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 ```
 
 
-  훈련에서 설정할 수 있는 파라미터는 다음과 같습니다.
-
+  훈련에서 설정할 수 있는 파라미터는 다음과 같습니다.  
 
 |파라미터|설명|기본값|
 |------|---|---|
