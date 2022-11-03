@@ -7,7 +7,7 @@ git clone https://github.com/hjk1996/pet_food_weight_estimator.git
 ```
   
   
-2. 모델의 dependency를 설치합니다.
+2. dependency를 설치합니다.
 ```
 pip install -r requirements.txt
 ```
@@ -29,7 +29,6 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
 훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와   
 개별 이미지에 대한 정보를 담고 있는 image_meta_data.csv 파일을 data 폴더에 배치합니다.
   ```
-  #example
   root
   │   
   │   
@@ -67,7 +66,6 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 
 훈련 결과는 results 폴더에 저장됩니다.
   ```
-  #example
   root
   │   
   │   
