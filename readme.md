@@ -88,9 +88,9 @@ tensorboard를 통해 학습 결과를 확인할 수 있습니다.
 tensorboard --logdir=results/2022-11-03_10-37-07/log
 ```
 
-|지표|설명|
+|지표|설명|수식
 |------|---|
-|total_loss|Binary Cross Entropy + MAE|
-|mae|중량 예측 오차 $$MAE=1n∑i=1n|yi−y^i|$$|
+|total_loss|Binary Cross Entropy + MAE| |
+|mae|중량 예측 오차|$MAE=1n∑i=1n|yi−y^i|$|
 
 
