@@ -59,7 +59,7 @@ def validate_one_epoch(
     dataloader: DataLoader,
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
-    classification: bool
+    classification: bool,
 ) -> float:
     running_loss = 0.0
     running_mae = 0.0
@@ -105,7 +105,9 @@ def train_and_valid(
     optimizer = torch.optim.Adam(model.parameters())
     best_mae = float("inf")
     best_weights = model.state_dict()
-    save_path = os.path.join(save_path, str(datetime.now()).replace(":", "-").replace(" ", "_").split('.')[0])
+    save_path = os.path.join(
+        save_path, str(datetime.now()).replace(":", "-").replace(" ", "_").split(".")[0]
+    )
     writer = SummaryWriter(os.path.join(save_path, "log"))
 
     for i in range(n_epochs):
@@ -131,7 +133,7 @@ def train_and_valid(
                     dataloader=dataloader,
                     writer=writer,
                     loss_fn=loss_fn,
-                    classification=classification
+                    classification=classification,
                 )
 
                 if epoch_mae < best_mae:

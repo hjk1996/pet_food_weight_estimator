@@ -17,7 +17,10 @@ def count_parameters(model):
 
 
 def make_swin_v2_based_estimator(
-    device: torch.device,  linear_hidden_size: int = 768, classification: bool = True, n_classes: int = 21
+    device: torch.device,
+    linear_hidden_size: int = 768,
+    classification: bool = True,
+    n_classes: int = 21,
 ) -> torch.nn.Module:
     backbone = timm.create_model("swinv2_tiny_window8_256")
     backbone.head = None

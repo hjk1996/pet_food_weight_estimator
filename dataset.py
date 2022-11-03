@@ -32,9 +32,6 @@ class CustomDataset(Dataset):
 
     def __getitem__(self, idx):
         food_type = torch.zeros(self.n_classes).type(torch.FloatTensor)
-        # a = self.meta_data.iloc[idx, 0]
-        # print(a)
-        # print(type(a))
         food_type[self.meta_data.iloc[idx, 0]] = 1.0
 
         weight = torch.tensor([self.meta_data.iloc[idx, 1]]).type(torch.FloatTensor)
@@ -50,8 +47,23 @@ class CustomDataset(Dataset):
         return weight.to(self.device), food_type.to(self.device), img.to(self.device)
 
 
+# def load_meta_data(path: str) -> pd.DataFrame:
+#     return pd.read_csv(path)[["food_type", "gram", "image_name", "hash"]]
+
+
 def load_meta_data(path: str) -> pd.DataFrame:
-    return pd.read_csv(path)[["food_type", "gram", "image_name", "hash"]]
+    return pd.read_csv(path)
+
+
+def make_hash(df: pd.DataFrame) -> pd.Series:
+    return (
+        "bt"
+        + df["bowl_type"].astype(str)
+        + "ft"
+        + df["food_type"].astype(str)
+        + "gram"
+        + df["gram"].astype(str)
+    )
 
 
 def make_dataloaders(
@@ -65,7 +77,13 @@ def make_dataloaders(
     random_state: int = 1234,
 ) -> dict:
     meta_data = load_meta_data(meta_data_path)
-    train, test = train_test_split(meta_data, test_size=test_size, random_state=random_state)
+    meta_data["hash"] = make_hash(meta_data)
+    train, test = train_test_split(
+        meta_data[["food_type", "gram", "image_name"]],
+        test_size=test_size,
+        random_state=random_state,
+        stratify=meta_data["hash"],
+    )
     train = train[:100]
     test = test[:100]
     train_dataset = CustomDataset(
