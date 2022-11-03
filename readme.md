@@ -20,10 +20,10 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
   
 |칼럼 이름|내용|예시|
 |------|---|---|
-|bowl_type|사료 용기 종류|테스트3|
-|food_type|사료 종류|테스트3|
-|gram|사료 무게|테스트3|
-|image_name|이미지 이름|테스트3|
+|bowl_type|사료 용기 종류 (0부터 시작)|0|
+|food_type|사료 종류 (0부터 시작)|3|
+|gram|사료 무게|20|
+|image_name|이미지 이름|image1.jpg|
   
 1. 
 훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와   
