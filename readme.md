@@ -1,12 +1,10 @@
 ## 설치
 ---
 
-1. 파이썬 가상환경(3.7.13)을 생성한 뒤 repository를 clone합니다.
+1. 파이썬 가상환경(3.7.13)을 생성하고 활성화한 뒤 repository를 clone합니다.
 ```
 git clone https://github.com/hjk1996/pet_food_weight_estimator.git
-```
-  
-  
+```  
 2. dependency를 설치합니다.
 ```
 pip install -r requirements.txt
@@ -53,7 +51,7 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
 python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 ```
 
-훈련에서 설정할 수 있는 파라미터는 다음과 같습니다.  
+학습 과정에서 설정할 수 있는 파라미터는 다음과 같습니다.  
 |파라미터|설명|기본값|
 |------|---|---|
 |epoch|훈련 epoch 수|1000|
@@ -64,7 +62,7 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 |test_size|전체 데이터셋에서 평가 데이터셋 비중|0.2|
 |weights|모델 가중치 경로, 이전에 학습시켜 놓은 가중치가 있을 경우 사용|None|
 
-훈련 결과는 results 폴더에 저장됩니다.
+학습 결과는 results 폴더에 저장됩니다.
   ```
   root
   │   
