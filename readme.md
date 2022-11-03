@@ -64,4 +64,25 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 |test_size|전체 데이터셋에서 평가 데이터셋 비중|0.2|
 |weights|모델 가중치 경로, 이전에 학습시켜 놓은 가중치가 있을 경우 사용|None|
 
+훈련 결과는 results 폴더에 저장됩니다.
+  ```
+  #example
+  root
+  │   
+  │   
+  └───results
+      │   
+      │   
+      └───2022-11-03_10-37-07
+          └───log (훈련 log가 저장되는 폴더)
+          └───best.pt (최고 성능을 기록한 모델 가중치)
+          └───last.pt (훈련 종료 시점 모델 가중치)
+  ```
+### 3. 결과 확인
+
+tensorboard를 통해 학습 결과를 확인할 수 있습니다.
+```
+tensorboard --logdir=results/
+```
+
 
