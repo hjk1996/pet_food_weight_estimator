@@ -5,14 +5,14 @@
 ```
 git clone https://github.com/hjk1996/pet_food_weight_estimator.git
 ```
-
-
+  
+  
 2. 모델의 dependency를 설치합니다.
 ```
 pip install -r requirements.txt
 ```
-
-
+  
+  
 ## 모델 훈련
 ---
 
