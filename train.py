@@ -43,8 +43,8 @@ def train_one_epoch(
     print(f"EPOCH[{epoch}] Train/Loss: {epoch_loss}")
     print(f"EPOCH[{epoch}] Train/MAE: {epoch_mae}")
 
-    writer.add_scalar("Loss/train/total", epoch_loss, epoch)
-    writer.add_scalar("Loss/train/mae", epoch_mae, epoch)
+    writer.add_scalar("Train/total_loss", epoch_loss, epoch)
+    writer.add_scalar("Train/mae", epoch_mae, epoch)
 
 
 def evaluate_classification(gt: torch.Tensor, pred_logit: torch.Tensor) -> int:
@@ -86,10 +86,10 @@ def validate_one_epoch(
     if classification:
         print(f"EPOCH[{epoch}] Val/ACC: {epoch_acc}", "\n")
 
-    writer.add_scalar("Loss/valid/total", epoch_loss, epoch)
-    writer.add_scalar("Loss/valid/mae", epoch_mae, epoch)
+    writer.add_scalar("Valid/total_loss", epoch_loss, epoch)
+    writer.add_scalar("Valid/mae", epoch_mae, epoch)
     if classification:
-        writer.add_scalar("Acc/valid", epoch_acc, epoch)
+        writer.add_scalar("Valid/acc", epoch_acc, epoch)
 
     return epoch_mae
 
