@@ -75,8 +75,8 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
           └───best.pt (최고 성능을 기록한 모델 가중치)
           └───last.pt (훈련 종료 시점 모델 가중치)
   ```
-### 3. 결과 확인
-
+## 결과 확인
+---
 tensorboard를 통해 학습 결과를 확인할 수 있습니다.  
 다음 명령어를 실행한 뒤 제공하는 URL로 이동하거나 http://localhost:6006/ 로 이동해 학습 결과를 확인합니다.
 ```
