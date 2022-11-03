@@ -13,7 +13,7 @@ pip install -r requirements.txt
   
 ## 학습
 ---
-### 1. 데이터 세팅
+#### 1. 데이터 세팅
 수집한 이미지에 대한 메타 데이터를 담고 있는 image_meta_data.csv 파일을 생성합니다.  
 image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.  
 
@@ -43,7 +43,7 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
       └───image_meta_data.csv
   ```
 
-### 2. 학습 시작
+#### 2. 학습 시작
 
 명령어를 입력해 모델 학습을 실시합니다.  
 ```
