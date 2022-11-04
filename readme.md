@@ -1,37 +1,34 @@
-## 설치
+## 설치 및 구동환경 설정
 ---
 
-1. 파이썬 가상환경(3.7.13)을 생성하고 활성화시킨 뒤 repository를 clone합니다.
+1. docker 이미지를 다운로드 합니다.
 ```
-git clone https://github.com/hjk1996/pet_food_weight_estimator.git
+docker pull hjk1996/iitp:0.1
 ```  
-
-
-2. 컴퓨터 환경에 적합한 pytorch를 설치합니다.  
-https://pytorch.org/get-started/locally/  
-
-
-3. 나머지 dependency를 설치합니다.
-```
-pip install -r requirements.txt
-```
-
-
   
+2. username과 password를 입력하고 repository를 클론합니다. 
+```
+git clone https://<USERNAME>:<PASSWORD>github.com/hjk1996/pet_food_weight_estimator.git
+```
   
+3. clone된 repository 경로와 container 내의 작업경로를 매핑한 뒤 내려 받은 이미지로 container를 생성합니다.
+```
+docker run -it -v <repository>:/workspace hjk1996/iitp:0.1 /bin/bash
+```
+   
 ## 학습
 ---
 ### 1. 데이터 세팅
 수집한 이미지에 대한 메타 데이터를 담고 있는 image_meta_data.csv 파일을 생성합니다.  
 image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.  
-
+  
 |칼럼 이름|내용|예시|
 |------|---|---|
 |bowl_type|사료 용기 종류 (0부터 시작)|0|
 |food_type|사료 종류 (0부터 시작)|3|
 |gram|사료 무게|20|
 |image_name|이미지 이름|image1.jpg|
-  
+   
 훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와   
 개별 이미지에 대한 정보를 담고 있는 image_meta_data.csv 파일을 data 폴더에 배치합니다.
   ```
@@ -50,15 +47,14 @@ image_meta_data.csv는 다음과 같은 column을 가지고 있습니다.
       │
       └───image_meta_data.csv
   ```
-
+  
 ### 2. 학습 시작
-
 명령어를 입력해 모델 학습을 실시합니다.  
 ```
 # example
 python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 ```
-
+  
 학습 과정에서 설정할 수 있는 파라미터는 다음과 같습니다.  
 |파라미터|설명|기본값|
 |------|---|---|
@@ -70,20 +66,21 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 |n_classes|사료 종류 수, 사료 종류 분류 학습할 경우 입력 필수|21|
 |test_size|전체 데이터셋에서 평가 데이터셋 비중|0.2|
 |weights|모델 가중치 경로, 이전에 학습시켜 놓은 가중치가 있을 경우 사용|None|
-
+  
 학습 결과는 results 폴더에 저장됩니다.
-  ```
-  root
-  │   
-  │   
-  └───results
-      │   
-      │   
-      └───2022-11-03_10-37-07
-          └───log (훈련 log가 저장되는 폴더)
-          └───best.pt (최고 성능을 기록한 모델 가중치)
-          └───last.pt (훈련 종료 시점 모델 가중치)
-  ```
+```
+root
+│   
+│   
+└───results
+    │   
+    │   
+    └───2022-11-03_10-37-07
+        └───log (훈련 log가 저장되는 폴더)
+        └───best.pt (최고 성능을 기록한 모델 가중치)
+        └───last.pt (훈련 종료 시점 모델 가중치)
+```
+  
 ## 학습 결과 확인
 ---
 tensorboard를 통해 학습 결과를 확인할 수 있습니다.  
@@ -92,7 +89,7 @@ tensorboard를 통해 학습 결과를 확인할 수 있습니다.
 #example
 tensorboard --logdir=results/2022-11-03_10-37-07/log
 ```
-
+  
 |지표|설명|
 |------|---|
 |total_loss|Binary Cross Entropy(사료 종류 분류 오차) + MAE(중량 예측 오차)|

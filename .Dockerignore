@@ -1,0 +1,14 @@
+.venv
+.idea
+.git
+.gitignore
+.dockerignore
+Dockerfile
+*.md
+*.sh
+*.yml
+
+# 
+data
+model_weights
+results
