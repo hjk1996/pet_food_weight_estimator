@@ -83,8 +83,6 @@ def make_dataloaders(
         random_state=random_state,
         stratify=meta_data["hash"],
     )
-    train = train[:100]
-    test = test[:100]
     train_dataset = CustomDataset(
         train, img_dir, n_classes, device, transform=transform, resize=resize
     )

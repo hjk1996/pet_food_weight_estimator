@@ -263,7 +263,7 @@ crashlytics-build.properties
 fabric.properties
 
 # data
-data
+data/images/*.jpg
 model_weights/*.pt
 
 # train log

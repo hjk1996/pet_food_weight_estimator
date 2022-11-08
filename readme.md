@@ -13,7 +13,7 @@ git clone https://<USERNAME>:<PASSWORD>@github.com/hjk1996/pet_food_weight_estim
   
 3. clone된 repository 경로와 container 내의 작업경로를 매핑한 뒤 내려 받은 이미지로 container를 생성합니다.
 ```
-docker run -it -v <repository>:/workspace hjk1996/iitp:0.1 /bin/bash
+docker run -it -v <repository>:/workspace/ hjk1996/iitp:0.1 /bin/bash
 ```
    
 ## 학습
