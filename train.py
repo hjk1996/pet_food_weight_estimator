@@ -151,7 +151,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--epoch", default=1000, type=int, help="훈련 에포크 수")
     parser.add_argument("--batch_size", default=32, type=int, help="배치 사이즈")
-    parser.add_argument("--resize", default=None, type=int, help="리사이즈 이후 이미지의 너비(w)와 높이(h)")
+    parser.add_argument(
+        "--resize", default=None, type=int, help="리사이즈 이후 이미지의 너비(w)와 높이(h)"
+    )
     parser.add_argument("--hidden_size", default=768, type=int, help="FC 유닛 수")
     parser.add_argument(
         "--classification", default=True, type=bool, help="사료 종류 분류할지 여부"
@@ -174,7 +176,7 @@ if __name__ == "__main__":
         test_size=args.test_size,
         batch_size=args.batch_size,
         transform=T.AugMix(),
-        resize=(args.resize, args.resize) if args.resize else None
+        resize=(args.resize, args.resize) if args.resize else None,
     )
 
     model = make_swin_v2_based_estimator(
@@ -185,8 +187,7 @@ if __name__ == "__main__":
     )
 
     if args.weights:
-        state_dict = torch.load(args.weights)
-        model.load_state_dict(state_dict)
+        model.load_state_dict(torch.load(args.weights))
 
     train_and_valid(
         model=model,

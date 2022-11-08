@@ -18,7 +18,7 @@ class CustomDataset(Dataset):
         n_classes: int,
         device: torch.device,
         transform=None,
-        resize: Tuple[int, int] = None
+        resize: Tuple[int, int] = None,
     ):
         self.meta_data = meta_data
         self.img_dir = img_dir
@@ -72,7 +72,7 @@ def make_dataloaders(
     test_size: float,
     batch_size: int,
     transform=None,
-    resize: Tuple[int, int]=None,
+    resize: Tuple[int, int] = None,
     random_state: int = 1234,
 ) -> dict:
     meta_data = load_meta_data(meta_data_path)
