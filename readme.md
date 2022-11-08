@@ -4,7 +4,7 @@ docker를 통해 구동환경을 설정할 것을 권장합니다.
 
 1. docker 이미지를 다운로드 합니다.
 ```
-docker pull hjk1996/iitp:0.1
+docker pull hjk1996/iitp:0.2
 ```  
   
 2. repository를 클론합니다. 
