@@ -110,6 +110,6 @@ python inference.py --image_path ./data/images/image1.jpg --weights ./model_weig
 |image_path|이미지 파일 경로||
 |weights|모델 가중치 경로||
 |resize|해당 파라미터의 값을 입력하면 입력한 사이즈로 이미지가 리사이즈된 후 모델의 입력으로 전달됨|None|
-|classification|사료 종류도 같이 분류하는 모델 여부|True|
-|n_classes|사료 종류도 같이 분류하는 모델일 경우 모델이 분류할 수 있는 사료의 종류의 수|21|
-|mapping_path|모델의 사료 종류 분류에 대한 output과 실제 사료의 이름을 매핑해주는 json 파일의 경로. 없으면 사료 종류에 대한 indice를 반환함.|None|
+|classification|모델의 사료 종류 분류 기능 지원 여부|True|
+|n_classes|모델이 사료 종류 분류가 가능할 경우 모델이 분류할 수 있는 사료의 종류의 수|21|
+|mapping_path|모델의 사료 종류 예측에 대한 output과 실제 사료의 이름을 매핑해주는 json 파일의 경로. 없으면 사료 종류에 대한 indice만 반환함.|None|
