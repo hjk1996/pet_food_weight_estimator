@@ -16,10 +16,11 @@ def inference_on_one_image(
     classification: bool,
     n_classes: int,
     mapping_path: str = None,
+    resize: int = None
 ) -> Union[tuple,int]:
     print(f"{image_path}에 대한 예측 시작..\n")
     device = torch.device("cpu")
-    img = load_image_as_input_tensor(image_path)
+    img = load_image_as_input_tensor(image_path, resize=resize)
     model = make_swin_v2_based_estimator(
         device=device, classification=classification, n_classes=n_classes
     ).to(device)
@@ -50,6 +51,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_path", type=str, required=True, help="예측할 이미지의 경로")
     parser.add_argument("--weights", type=str, required=True, help="예측에 사용할 모델 가중치의 경로")
+    parser.add_argument("--resize", type=int, default=None, help="값을 입력하면 해당 사이즈로 이미지를 리사이즈한 후 모델의 입력으로 전달함")
     parser.add_argument("--classification", type=bool, default=True, help="사료 종류 추론 여부")
     parser.add_argument("--n_classes", type=int, default=21, help="사료 종류 수")
     parser.add_argument(
@@ -57,10 +59,11 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    inference_on_one_image(
+    results = inference_on_one_image(
         image_path=args.image_path,
         weights_path=args.weights,
         classification=args.classification,
         n_classes=args.n_classes,
-        mapping_path=args.mapping_path
+        mapping_path=args.mapping_path,
+        resize=args.resize
     )

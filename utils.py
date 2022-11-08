@@ -4,6 +4,7 @@ from typing import List
 import pandas as pd
 import torch
 from torchvision.io import read_image
+from torchvision.transforms import Resize
 import timm
 
 from models import SwinV2BasedEstimator
@@ -25,8 +26,10 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def load_image_as_input_tensor(path: str) -> torch.Tensor:
+def load_image_as_input_tensor(path: str, resize: int = None) -> torch.Tensor:
     img = read_image(path)
+    if resize:
+        img = Resize(resize)(img)
     return img.type(torch.FloatTensor) / 255.0
 
 
