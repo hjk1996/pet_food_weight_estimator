@@ -12,9 +12,13 @@ docker pull hjk1996/iitp:0.2
 git clone https://github.com/hjk1996/pet_food_weight_estimator.git
 ```
   
-3. clone된 repository 경로와 container 내의 작업경로를 매핑한 뒤 내려 받은 이미지로 container를 생성합니다.
+3. clone된 repository 경로와 container 내의 작업경로를 매핑한 뒤 내려 받은 이미지로 가상환경을 생성합니다.
 ```
 docker run -it -v <repository>:/workspace/ hjk1996/iitp:0.1 /bin/bash
+```
+가상환경 내에서 gpu를 사용하고자 한다면 다음 명령어를 입력해야합니다.
+```
+docker run --gpus=all -it -v <repository>:/workspace/ hjk1996/iitp:0.1 /bin/bash
 ```
    
 ## 학습
