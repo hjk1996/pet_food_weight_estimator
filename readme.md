@@ -17,7 +17,7 @@ git clone https://github.com/hjk1996/pet_food_weight_estimator.git
 # gpu 사용하지 않는 경우
 docker run -it -v <repository>:/workspace/ hjk1996/iitp:0.1 /bin/bash
 # gpu 사용하는 경우
-docker run --gpus '"device=0"' -it -v <repository>:/workspace/ hjk1996/iitp:0.1 /bin/bash
+docker run --gpus '"device=0"' -it -v <repository>:/workspace/ hjk1996/iitp:0.2 /bin/bash
 ```
    
 ## 학습
