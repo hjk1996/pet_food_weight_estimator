@@ -13,8 +13,8 @@ import torchvision.transforms as T
 
 from loss_fn import MultiTaskLossWrapper
 from dataset import make_dataloaders
-from utils import save_model_weights
-from models.swin_v2 import make_swin_v2_based_estimator
+from utils import save_model_weights, load_model_config, make_swin_v2_based_estimator
+
 
 
 def train_one_epoch(
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--resize", default=None, type=int, help="리사이즈 이후 이미지의 너비(w)와 높이(h)"
     )
-    parser.add_argument("--hidden_size", default=768, type=int, help="FC 유닛 수")
+    parser.add_argument("--model_name", default="swinv2_tiny_window8_256", type=str, help="학습에 사용할 모델 이름")
     parser.add_argument("--n_classes", default=21, type=int, help="사료 클래스 수")
     parser.add_argument("--on_memory", default=False, type=bool, help="이미지 데이터를 메모리 상에 올려놓고 학습시킬지 여부")
     parser.add_argument("--test_size", default=0.2, type=float, help="테스트 데이터셋 비율")
@@ -159,6 +159,8 @@ if __name__ == "__main__":
         config = json.load(f)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    model_config = load_model_config(args.model_name)
 
     dataloaders = make_dataloaders(
         meta_data_path=config["image_meta_data_path"],
@@ -172,9 +174,10 @@ if __name__ == "__main__":
         resize=(args.resize, args.resize) if args.resize else None,
     )
 
+    make_swin_v2_based_estimator()
     model = make_swin_v2_based_estimator(
         device=device,
-        linear_hidden_size=args.hidden_size,
+        model_config=model_config,
         n_classes=args.n_classes,
     )
 
