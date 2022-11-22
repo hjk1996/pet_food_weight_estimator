@@ -66,7 +66,6 @@ python train.py --epoch 500 --batch_size 16 --weights ./model_weights/best.pt
 |batch_size|데이터셋 batch 크기|32|
 |resize|리사이즈 이후 이미지의 너비와 높이, 학습 단계에서는 학습 속도를 위해 사용하지 않고 미리 모델의 인풋에 맞게 리사이징 된 이미지를 사용하는 것을 권장함|None|
 |hidden_size|FC 레이어 유닛 수|768|
-|classification|사료 종류 학습 여부, False로 설정하면 사료 중량만 학습하고 사료 종류는 학습하지 않음|True|
 |n_classes|사료 종류 수, 사료 종류 분류 학습할 경우 입력 필수|21|
 |test_size|전체 데이터셋에서 평가 데이터셋 비중|0.2|
 |weights|모델 가중치 경로, 이전에 학습시켜 놓은 가중치가 있을 경우 사용|None|
@@ -114,6 +113,5 @@ python inference.py --image_path ./data/images/image1.jpg --weights ./model_weig
 |image_path|이미지 파일 경로||
 |weights|모델 가중치 경로||
 |resize|해당 파라미터의 값을 입력하면 입력한 사이즈로 이미지가 리사이즈된 후 모델의 입력으로 전달됨|None|
-|classification|모델의 사료 종류 분류 기능 지원 여부|True|
 |n_classes|모델이 사료 종류 분류가 가능할 경우 모델이 분류할 수 있는 사료의 종류의 수|21|
 |mapping_path|모델의 사료 종류 예측에 대한 output과 실제 사료의 이름을 매핑해주는 json 파일의 경로. 없으면 사료 종류에 대한 indice만 반환함.|None|

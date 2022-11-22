@@ -34,7 +34,6 @@ class SwinV2BasedEstimator(nn.Module):
         self.estimator_block_2 = self._make_linear_block()
         self.estimator_block_3 = self._make_last_linear_block(last_out_feature=1)
 
-
         self.classifier_block_1 = self._make_adaptor_linear_block()
         self.classifier_block_2 = self._make_linear_block()
         self.classifier_block_3 = self._make_last_linear_block(
@@ -91,6 +90,3 @@ class SwinV2BasedEstimator(nn.Module):
         class_logit = self.classifier_block_3(x2)
 
         return weight, class_logit
-
-
-        
