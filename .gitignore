@@ -270,4 +270,4 @@ model_weights/*.pt
 results/*
 
 # test
-/testing.py
+testing.py
