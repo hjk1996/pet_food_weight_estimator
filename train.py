@@ -5,6 +5,8 @@ import json
 
 import argparse
 import torch
+from torch import Tensor
+import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import torchvision.transforms as T
@@ -17,7 +19,7 @@ from utils import make_swin_v2_based_estimator, save_model_weights
 
 def train_one_epoch(
     epoch: int,
-    model: torch.nn.Module,
+    model: nn.Module,
     dataloader: DataLoader,
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
@@ -47,7 +49,7 @@ def train_one_epoch(
     writer.add_scalar("Train/mae", epoch_mae, epoch)
 
 
-def evaluate_classification(gt: torch.Tensor, pred_logit: torch.Tensor) -> int:
+def evaluate_classification(gt: Tensor, pred_logit: Tensor) -> int:
     pred = torch.sigmoid(pred_logit)
     pred = torch.where(pred >= 0.5, 1.0, 0.0)
     return torch.all(gt == pred, dim=1).sum().item()
@@ -55,7 +57,7 @@ def evaluate_classification(gt: torch.Tensor, pred_logit: torch.Tensor) -> int:
 
 def validate_one_epoch(
     epoch: int,
-    model: torch.nn.Module,
+    model: nn.Module,
     dataloader: DataLoader,
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
@@ -95,7 +97,7 @@ def validate_one_epoch(
 
 
 def train_and_valid(
-    model: torch.nn.Module,
+    model: nn.Module,
     dataloaders: dict,
     n_epochs: int,
     save_path: str,

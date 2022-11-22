@@ -268,3 +268,6 @@ model_weights/*.pt
 
 # train log
 results/*
+
+# test
+/testing.py

@@ -3,6 +3,8 @@ from typing import List
 
 import pandas as pd
 import torch
+import torch.nn as nn
+from torch import Tensor, FloatTensor
 from torchvision.io import read_image
 from torchvision.transforms import Resize
 import timm
@@ -26,14 +28,14 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def load_image_as_input_tensor(path: str, resize: int = None) -> torch.Tensor:
+def load_image_as_input_tensor(path: str, resize: int = None) -> Tensor:
     img = read_image(path)
     if resize:
         img = Resize(resize)(img)
-    return img.type(torch.FloatTensor) / 255.0
+    return img.type(FloatTensor) / 255.0
 
 
-def get_class_prediction_from_logit(class_logit: torch.Tensor) -> List[int]:
+def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
     pred = torch.sigmoid(class_logit)
     pred = torch.where(pred >= 0.5, 1.0, 0.0)
     return pred.nonzero(as_tuple=True)[0].tolist()
@@ -44,7 +46,7 @@ def make_swin_v2_based_estimator(
     linear_hidden_size: int = 768,
     classification: bool = True,
     n_classes: int = 21,
-) -> torch.nn.Module:
+) -> nn.Module:
     backbone = timm.create_model("swinv2_tiny_window8_256")
     backbone.head = None
     model = SwinV2BasedEstimator(

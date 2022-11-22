@@ -1,16 +1,17 @@
 from typing import Tuple
 
-import torch
+from torch import Tensor
+import torch.nn as nn
 from torchvision.transforms import Resize
 
 
-class SwinV2BasedEstimator(torch.nn.Module):
+class SwinV2BasedEstimator(nn.Module):
     def __init__(
         self,
-        backbone: torch.nn.Module,
+        backbone: nn.Module,
         backbone_out_size: int,
         linear_hidden_size: int,
-        detector: torch.nn.Module = None,
+        detector: nn.Module = None,
         cropping: bool = False,
         classification: bool = False,
         num_classes: int = 0,
@@ -44,35 +45,35 @@ class SwinV2BasedEstimator(torch.nn.Module):
                 last_out_feature=num_classes
             )
 
-        self.relu = torch.nn.ReLU()
+        self.relu = nn.ReLU()
 
-    def _make_adaptor_linear_block(self) -> torch.nn.modules.container.Sequential:
-        return torch.nn.Sequential(
-            torch.nn.Linear(
+    def _make_adaptor_linear_block(self) -> nn.modules.container.Sequential:
+        return nn.Sequential(
+            nn.Linear(
                 in_features=self.backbone_out_size, out_features=self.linear_hidden_size
             ),
-            torch.nn.BatchNorm1d(num_features=self.linear_hidden_size),
-            torch.nn.ReLU(),
+            nn.BatchNorm1d(num_features=self.linear_hidden_size),
+            nn.ReLU(),
         )
 
-    def _make_linear_block(self) -> torch.nn.modules.container.Sequential:
-        return torch.nn.Sequential(
-            torch.nn.Linear(
+    def _make_linear_block(self) -> nn.modules.container.Sequential:
+        return nn.Sequential(
+            nn.Linear(
                 in_features=self.linear_hidden_size,
                 out_features=self.linear_hidden_size,
             ),
-            torch.nn.BatchNorm1d(num_features=self.linear_hidden_size),
-            torch.nn.ReLU(),
+            nn.BatchNorm1d(num_features=self.linear_hidden_size),
+            nn.ReLU(),
         )
 
     def _make_last_linear_block(
         self, last_out_feature: int
-    ) -> torch.nn.modules.container.Sequential:
-        return torch.nn.Linear(
+    ) -> nn.modules.container.Sequential:
+        return nn.Linear(
             in_features=self.linear_hidden_size, out_features=last_out_feature
         )
 
-    def _forward_with_classifier(self, feature_map: torch.Tensor):
+    def _forward_with_classifier(self, feature_map: Tensor):
         x1 = self.estimator_block_1(feature_map)
         x1 = self.estimator_block_2(x1)
         x1 = self.estimator_block_3(x1)
@@ -84,7 +85,7 @@ class SwinV2BasedEstimator(torch.nn.Module):
 
         return weight, class_logit
 
-    def _forward_without_classifier(self, feature_map: torch.Tensor):
+    def _forward_without_classifier(self, feature_map: Tensor):
         x1 = self.estimator_block_1(feature_map)
         x1 = self.estimator_block_2(x1)
         x1 = self.estimator_block_3(x1)
@@ -92,7 +93,7 @@ class SwinV2BasedEstimator(torch.nn.Module):
 
         return weight
 
-    def forward(self, image) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, image) -> Tuple[Tensor, Tensor]:
         if self.cropping:
             image = self.detector(image)
             image = self.resizer(image)
