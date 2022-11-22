@@ -61,12 +61,10 @@ def validate_one_epoch(
     dataloader: DataLoader,
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
-    classification: bool,
 ) -> float:
     running_loss = 0.0
     running_mae = 0.0
-    if classification:
-        right_count = 0
+    right_count = 0
     dataloader_len = len(dataloader)
 
     for weight, food_type, img in dataloader:
@@ -75,23 +73,19 @@ def validate_one_epoch(
             loss = loss_fn(preds, (weight, food_type))
             running_loss += loss.item()
             running_mae += loss_fn.mae(preds[0], weight)
-            if classification:
-                right_count += evaluate_classification(food_type, preds[1])
+            right_count += evaluate_classification(food_type, preds[1])
 
     epoch_loss = running_loss / dataloader_len
     epoch_mae = running_mae / dataloader_len
-    if classification:
-        epoch_acc = right_count / dataloader_len
+    epoch_acc = right_count / dataloader_len
 
     print(f"EPOCH[{epoch}] Val/Loss: {epoch_loss}")
     print(f"EPOCH[{epoch}] Val/MAE: {epoch_mae}")
-    if classification:
-        print(f"EPOCH[{epoch}] Val/ACC: {epoch_acc}", "\n")
+    print(f"EPOCH[{epoch}] Val/ACC: {epoch_acc}", "\n")
 
     writer.add_scalar("Valid/total_loss", epoch_loss, epoch)
     writer.add_scalar("Valid/mae", epoch_mae, epoch)
-    if classification:
-        writer.add_scalar("Valid/acc", epoch_acc, epoch)
+    writer.add_scalar("Valid/acc", epoch_acc, epoch)
 
     return epoch_mae
 
@@ -101,9 +95,8 @@ def train_and_valid(
     dataloaders: dict,
     n_epochs: int,
     save_path: str,
-    classification: bool = True,
 ) -> SummaryWriter:
-    loss_fn = MultiTaskLossWrapper(classification=classification)
+    loss_fn = MultiTaskLossWrapper(classification=True)
     optimizer = torch.optim.Adam(model.parameters())
     best_mae = float("inf")
     best_weights = model.state_dict()
@@ -135,7 +128,6 @@ def train_and_valid(
                     dataloader=dataloader,
                     writer=writer,
                     loss_fn=loss_fn,
-                    classification=classification,
                 )
 
                 if epoch_mae < best_mae:
@@ -157,9 +149,6 @@ if __name__ == "__main__":
         "--resize", default=None, type=int, help="리사이즈 이후 이미지의 너비(w)와 높이(h)"
     )
     parser.add_argument("--hidden_size", default=768, type=int, help="FC 유닛 수")
-    parser.add_argument(
-        "--classification", default=True, type=bool, help="사료 종류 분류할지 여부"
-    )
     parser.add_argument("--n_classes", default=21, type=int, help="사료 클래스 수")
     parser.add_argument("--test_size", default=0.2, type=float, help="테스트 데이터셋 비율")
     parser.add_argument("--weights", default=None, type=str, help="사용할 모델 가중치의 경로")
@@ -184,7 +173,6 @@ if __name__ == "__main__":
     model = make_swin_v2_based_estimator(
         device=device,
         linear_hidden_size=args.hidden_size,
-        classification=args.classification,
         n_classes=args.n_classes,
     )
 
