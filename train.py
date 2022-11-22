@@ -11,10 +11,10 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 import torchvision.transforms as T
 
-
 from loss_fn import MultiTaskLossWrapper
 from dataset import make_dataloaders
-from utils import make_swin_v2_based_estimator, save_model_weights
+from utils import save_model_weights
+from models.swin_v2 import make_swin_v2_based_estimator
 
 
 def train_one_epoch(
@@ -150,6 +150,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--hidden_size", default=768, type=int, help="FC 유닛 수")
     parser.add_argument("--n_classes", default=21, type=int, help="사료 클래스 수")
+    parser.add_argument("--on_memory", default=False, type=bool, help="이미지 데이터를 메모리 상에 올려놓고 학습시킬지 여부")
     parser.add_argument("--test_size", default=0.2, type=float, help="테스트 데이터셋 비율")
     parser.add_argument("--weights", default=None, type=str, help="사용할 모델 가중치의 경로")
     args = parser.parse_args()
@@ -164,6 +165,7 @@ if __name__ == "__main__":
         img_dir=config["image_folder_path"],
         n_classes=args.n_classes,
         device=device,
+        on_memory=args.on_memory,
         test_size=args.test_size,
         batch_size=args.batch_size,
         transform=T.AugMix(),

@@ -1,5 +1,7 @@
 import os
+import json
 from typing import List
+from dataclasses import dataclass
 
 import pandas as pd
 import torch
@@ -9,8 +11,27 @@ from torchvision.io import read_image
 from torchvision.transforms import Resize
 import timm
 
-from models import SwinV2BasedEstimator
+from models.swin_v2 import SwinV2BasedEstimator
 
+
+@dataclass
+class ModelConfig:
+    name: str
+    resolution: int
+    feature_out_size: int
+
+    @classmethod
+    def from_json(cls, json_object: dict):
+        return cls(
+            name=json_object["name"],
+            resolution=json_object["resolution"],
+            feature_out_size=json_object["feature_out_size"],
+        )
+
+
+def load_model_config(model_name: str) -> ModelConfig:
+    with open('model_configs.json', 'r') as f:
+        return ModelConfig.from_json(json.load(f)[model_name])
 
 def save_model_weights(weights: dict, save_path: str, best: bool = False) -> None:
     new_save_path = os.path.join(save_path, "best.pt" if best else "last.pt")
@@ -28,7 +49,7 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def load_image_as_input_tensor(path: str, resize: int = None) -> Tensor:
+def load_image_as_tensor(path: str, resize: int = None) -> Tensor:
     img = read_image(path)
     if resize:
         img = Resize(resize)(img)
@@ -43,15 +64,17 @@ def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
 
 def make_swin_v2_based_estimator(
     device: torch.device,
-    linear_hidden_size: int = 768,
-    n_classes: int = 21,
+    model_config: ModelConfig,
+    num_classes: int = 21,
 ) -> nn.Module:
-    backbone = timm.create_model("swinv2_tiny_window8_256")
+
+    backbone = timm.create_model(model_config.name)
     backbone.head = None
+
     model = SwinV2BasedEstimator(
         backbone=backbone,
-        backbone_out_size=768,
-        linear_hidden_size=linear_hidden_size,
-        num_classes=n_classes,
+        feature_out_size=model_config.feature_out_size,
+        linear_hidden_size=model_config.feature_out_size,
+        num_classes=num_classes,
     ).to(device)
     return model

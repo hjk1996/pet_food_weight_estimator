@@ -1,9 +1,11 @@
 import os
-from typing import Tuple
+from typing import Tuple, List
+from glob import glob
+
 
 import pandas as pd
 import torch
-import torch
+from torch import Tensor
 from torchvision.transforms import Resize
 from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader
@@ -17,6 +19,7 @@ class CustomDataset(Dataset):
         img_dir: str,
         n_classes: int,
         device: torch.device,
+        on_memory: bool = False,
         transform=None,
         resize: Tuple[int, int] = None,
     ):
@@ -24,8 +27,19 @@ class CustomDataset(Dataset):
         self.img_dir = img_dir
         self.transform = transform
         self.n_classes = n_classes
+        self.on_memory = on_memory
         self.resizer = Resize(resize) if resize else None
         self.device = device
+        
+        if on_memory:
+            self._load_image_on_memory()
+
+    def _load_image_on_memory(self) -> None:
+        self.img_tensors = []
+        for i in range(len(self.meta_data)):
+            img_tensor = read_image(os.path.join(self.img_dir, self.meta_data.iloc[i, 2]))
+            self.img_tensors.append(img_tensor)
+
 
     def __len__(self):
         return len(self.meta_data)
@@ -36,11 +50,15 @@ class CustomDataset(Dataset):
 
         weight = torch.tensor([self.meta_data.iloc[idx, 1]]).type(torch.FloatTensor)
 
-        img_path = os.path.join(self.img_dir, self.meta_data.iloc[idx, 2])
-        img = read_image(img_path)
+        if self.on_memory:
+            img = self.img_tensors[idx]
+        else:
+            img_path = os.path.join(self.img_dir, self.meta_data.iloc[idx, 2])
+            img = read_image(img_path)
 
         if self.transform:
             img = self.transform(img)
+
         if self.resizer:
             img = self.resizer(img)
 
@@ -71,6 +89,7 @@ def make_dataloaders(
     device: torch.device,
     test_size: float,
     batch_size: int,
+    on_memory: bool = False,
     transform=None,
     resize: Tuple[int, int] = None,
     random_state: int = 1234,
@@ -84,9 +103,9 @@ def make_dataloaders(
         stratify=meta_data["hash"],
     )
     train_dataset = CustomDataset(
-        train, img_dir, n_classes, device, transform=transform, resize=resize
+        train, img_dir, n_classes, device, transform=transform, resize=resize, on_memory=on_memory
     )
-    test_dataset = CustomDataset(test, img_dir, n_classes, device, resize=resize)
+    test_dataset = CustomDataset(test, img_dir, n_classes, device, resize=resize, on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 

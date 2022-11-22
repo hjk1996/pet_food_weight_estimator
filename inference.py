@@ -4,7 +4,7 @@ from typing import Union
 import argparse
 import torch
 from utils import (
-    load_image_as_input_tensor,
+    load_image_as_tensor,
     make_swin_v2_based_estimator,
     get_class_prediction_from_logit,
 )
@@ -19,8 +19,8 @@ def inference_on_one_image(
 ) -> Union[tuple, int]:
     print(f"{image_path}에 대한 예측 시작..\n")
     device = torch.device("cpu")
-    img = load_image_as_input_tensor(image_path, resize=resize)
-    model = make_swin_v2_based_estimator(device=device, n_classes=n_classes).to(device)
+    img = load_image_as_tensor(image_path, resize=resize)
+    model = make_swin_v2_based_estimator(device=device, num_classes=n_classes).to(device)
     model.load_state_dict(torch.load(weights_path))
 
     weight, class_logit = model(img)
@@ -35,7 +35,6 @@ def inference_on_one_image(
     print(f"무게: {weight} gram\n")
     print(f"사료 종류: {class_pred}")
     return weight, class_pred
-
 
 
 if __name__ == "__main__":
