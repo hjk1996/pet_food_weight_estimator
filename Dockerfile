@@ -18,9 +18,9 @@ RUN pip install timm==0.6.11 \
                 psutil 
 
 RUN apt-get -y update
-RUN apt-get install -y zip htop screen libgl1-mesa-glx git
-# RUN git clone https://github.com/hjk1996/pet_food_weight_estimator.git
+RUN apt-get install -y zip htop screen libgl1-mesa-glx libglib2.0-0 git
 # RUN git clone https://github.com/hjk1996/yolov7.git
+# RUN git clone https://github.com/hjk1996/pet_food_weight_estimator.git
 
 ENV PYTHONPATH="$PYTHONPATH:/workspace/yolov7"
 
