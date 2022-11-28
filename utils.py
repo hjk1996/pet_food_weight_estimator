@@ -52,8 +52,10 @@ def count_parameters(model):
 def load_image_as_tensor(path: str, resize: int = None) -> Tensor:
     img = read_image(path)
     if resize:
-        img = Resize(resize)(img)
-    return img.type(FloatTensor) / 255.0
+        img = Resize((resize, resize))(img)
+    img = img.type(FloatTensor) / 255.0
+    img = img.unsqueeze(0)
+    return img
 
 
 def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
