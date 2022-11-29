@@ -23,8 +23,9 @@ class SwinV2BasedEstimator(nn.Module):
 
         self.backbone = backbone
         self.detector = detector
-        self.resizer = Resize((256, 256))
 
+
+        self.detector = detector
         self.cropping = cropping
 
         self.feature_out_size = feature_out_size
@@ -71,18 +72,33 @@ class SwinV2BasedEstimator(nn.Module):
         return nn.Linear(
             in_features=self.linear_hidden_size, out_features=out_features
         )
+    
+        
 
-    def forward_feature(self, image) -> Tensor:
-        if self.cropping:
-            image = self.detector(image)
-            image = self.resizer(image)
+                
 
-        feature_map = self.backbone.forward_features(image)
+
+    def forward_feature(self, x) -> Tensor:
+        feature_map = self.backbone.forward_features(x)
         feature_map = feature_map.mean(1)
         return feature_map
 
-    def forward(self, image) -> Tuple[Tensor, Tensor]:
-        feature_map = self.forward_feature(image)
+    def foward_with_cropping(self, x) -> Tensor:
+        x, has_bowl = self.detector(x)
+        feature_map = self.forward_feature(x)
+        weight = self.estimator(feature_map)
+        class_logit = self.classifier(feature_map)
+        return weight[has_bowl], class_logit[has_bowl]
+
+    def forward(self, x) -> Tuple[Tensor, Tensor]:
+        '''
+            return:
+                weight [batch_size, 1]
+                class_logit [batch_size,  n_classes]
+        '''
+
+
+        feature_map = self.forward_feature(x)
         weight = self.estimator(feature_map)
         class_logit = self.classifier(feature_map)
         return weight, class_logit

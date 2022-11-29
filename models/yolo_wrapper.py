@@ -19,6 +19,12 @@ class YOLOWrapper(nn.Module):
 
     
     def forward(self, x):
+        '''
+        return: 
+            images [batch, 3, w, h]
+            has_bowl [batch, 1]
+
+        '''
 
         with torch.no_grad():
             preds, _ = self.model(x)
