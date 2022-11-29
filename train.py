@@ -142,51 +142,57 @@ def train_and_valid(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--epoch", default=1000, type=int, help="훈련 에포크 수")
-    parser.add_argument("--batch_size", default=32, type=int, help="배치 사이즈")
-    parser.add_argument(
-        "--resize", default=None, type=int, help="리사이즈 이후 이미지의 너비(w)와 높이(h)"
-    )
-    parser.add_argument("--model_name", default="swinv2_tiny_window8_256", type=str, help="학습에 사용할 모델 이름")
-    parser.add_argument("--n_classes", default=21, type=int, help="사료 클래스 수")
-    parser.add_argument("--on_memory", default=False, type=bool, help="이미지 데이터를 메모리 상에 올려놓고 학습시킬지 여부")
-    parser.add_argument("--test_size", default=0.2, type=float, help="테스트 데이터셋 비율")
-    parser.add_argument("--weights", default=None, type=str, help="사용할 모델 가중치의 경로")
-    args = parser.parse_args()
 
-    with open("config.json", "r") as f:
+
+    with open("train_config.json", "r") as f:
         config = json.load(f)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model_config = load_model_config(args.model_name)
+    model_config = load_model_config(config["model_name"])
 
-    dataloaders = make_dataloaders(
-        meta_data_path=config["image_meta_data_path"],
-        img_dir=config["image_folder_path"],
-        n_classes=args.n_classes,
-        device=device,
-        on_memory=args.on_memory,
-        test_size=args.test_size,
-        batch_size=args.batch_size,
-        transform=T.AugMix(),
-        resize=(args.resize, args.resize) if args.resize else None,
-    )
+    if config.get("cropper_weight_path") and config.get("cropper_input_size") and config.get("cropper_output_size"):
+        dataloaders = make_dataloaders(
+            meta_data_path=config["image_meta_data_path"],
+            img_dir=config["image_folder_path"],
+            n_classes=config["n_classes"],
+            device=device,
+            on_memory=config["on_memory"],
+            test_size=config["test_size"],
+            batch_size=config["batch_size"],
+            transform=T.AugMix(),
+            cropper_weight_path=config.get("cropper_weight_path"),
+            cropper_input_size=config.get("cropper_input_size"),
+            cropper_output_size=config.get("cropper_output_size"),
+        )       
+    else:
+
+
+        dataloaders = make_dataloaders(
+            meta_data_path=config["image_meta_data_path"],
+            img_dir=config["image_folder_path"],
+            n_classes=config["n_classes"],
+            device=device,
+            on_memory=config["on_memory"],
+            test_size=config["test_size"],
+            batch_size=config["batch_size"],
+            transform=T.AugMix(),
+            resize=(config.get("resize"), config.get("resize")) if config.get("resize") else None,
+        )
 
     make_swin_v2_based_estimator()
     model = make_swin_v2_based_estimator(
         device=device,
         model_config=model_config,
-        n_classes=args.n_classes,
+        n_classes=config["n_classes"],
     )
 
-    if args.weights:
-        model.load_state_dict(torch.load(args.weights))
+    if config.get("weight_path"):
+        model.load_state_dict(torch.load(config.get("weight_path")))
 
     train_and_valid(
         model=model,
         dataloaders=dataloaders,
-        n_epochs=args.epoch,
+        n_epochs=config["epoch"],
         save_path=config["save_path"],
     )
