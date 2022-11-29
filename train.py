@@ -141,10 +141,12 @@ def train_and_valid(
     return writer
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
+    args = parser.parse_args()
 
-
-    with open("train_config.json", "r") as f:
+    with open(args.train_config_path, "r") as f:
         config = json.load(f)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -164,6 +166,7 @@ if __name__ == "__main__":
             cropper_weight_path=config.get("cropper_weight_path"),
             cropper_input_size=config.get("cropper_input_size"),
             cropper_output_size=config.get("cropper_output_size"),
+
         )       
     else:
 
