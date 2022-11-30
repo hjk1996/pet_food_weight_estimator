@@ -66,10 +66,13 @@ class CustomDataset(Dataset):
             img = self.cropper(img.unsqueeze(0))[0].squeeze()
                         
         if self.transform:
+            img = torch.clamp((img * 255), min=0, max=255).type(torch.uint8)
             img = self.transform(img)
 
         if not self.cropper and self.resizer:
             img = self.resizer(img)
+
+        img = img.float() / 255
 
 
         return weight.to(self.device), food_type.to(self.device), img.to(self.device)
@@ -101,15 +104,22 @@ def make_dataloaders(
     transform=None,
     resize: Tuple[int, int] = None,
     random_state: int = 1234,
+    test_mode: bool = False
 ) -> dict:
     meta_data = pd.read_csv(meta_data_path)
     hash = make_hash(meta_data)
+
     train, test = train_test_split(
         meta_data,
         test_size=test_size,
         random_state=random_state,
         stratify=hash,
     )
+
+    if test_mode:
+        train = train.iloc[: 256, :]
+        test = test.iloc[: 32, :]
+        
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     train_dataset = CustomDataset(
         train, img_dir, n_classes, device, transform=transform, cropper=cropper, resize=resize, on_memory=on_memory

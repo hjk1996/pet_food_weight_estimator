@@ -17,7 +17,7 @@ class MultiTaskLossWrapper(nn.Module):
         super(MultiTaskLossWrapper, self).__init__()
         self.weight_loss_fn = RMSELoss()
         self.class_loss_fn = nn.BCEWithLogitsLoss(reduction="sum")
-        self.mae = nn.L1Loss()
+        # self.mae = nn.L1Loss()
         self.classification = classification
 
     def multi_task_forward(self, preds, gts):
