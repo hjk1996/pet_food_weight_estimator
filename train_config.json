@@ -4,7 +4,7 @@
   "test_size": 0.2,
   "resize": null,
   "model_name": "swinv2_tiny_window8_256",
-  "n_classes": 21,
+  "num_classes": 21,
   "on_memory": false,
   "image_folder_path": "./data/images",
   "image_meta_data_path": "./data/image_meta_data.csv",

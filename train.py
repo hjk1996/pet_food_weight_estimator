@@ -158,7 +158,7 @@ if __name__ == "__main__":
         dataloaders = make_dataloaders(
             meta_data_path=config["image_meta_data_path"],
             img_dir=config["image_folder_path"],
-            n_classes=config["n_classes"],
+            num_classes=config["num_classes"],
             device=device,
             on_memory=config["on_memory"],
             test_size=config["test_size"],
@@ -176,7 +176,7 @@ if __name__ == "__main__":
         dataloaders = make_dataloaders(
             meta_data_path=config["image_meta_data_path"],
             img_dir=config["image_folder_path"],
-            n_classes=config["n_classes"],
+            num_classes=config["num_classes"],
             device=device,
             on_memory=config["on_memory"],
             test_size=config["test_size"],
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     model = make_swin_v2_based_estimator(
         device=device,
         model_config=model_config,
-        num_classes=config["n_classes"],
+        num_classes=config["num_classes"],
     )
 
     if config.get("weight_path"):

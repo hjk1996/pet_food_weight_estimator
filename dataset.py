@@ -40,32 +40,53 @@ class CustomDataset(Dataset):
 
     def _load_image_on_memory(self) -> None:
         self.img_tensors = []
+        self.food_type_tensors = []
+        self.gram_tensors = []
+
         for i in range(len(self.meta_data)):
             img_tensor = read_image(os.path.join(self.img_dir, self.meta_data.iloc[i, 2])).float() / 255
             self.img_tensors.append(img_tensor)
+
+            food_type_tensor = torch.zeros(self.n_classes).type(torch.FloatTensor)
+            food_type_tensor[list(map(int, str(self.meta_data.iloc[i, 1]).split()))] = 1.0   
+            self.food_type_tensors.append(food_type_tensor)
+
+            gram_tensor = torch.tensor([self.meta_data.iloc[i, 2]]).type(torch.FloatTensor)
+            self.gram_tensors.append(gram_tensor)
+
+            
 
 
     def __len__(self):
         return len(self.meta_data)
 
     def __getitem__(self, idx):
-        food_type = torch.zeros(self.n_classes).type(torch.FloatTensor)
-        food_type[self.meta_data.iloc[idx, 1]] = 1.0
-
-        weight = torch.tensor([self.meta_data.iloc[idx, 2]]).type(torch.FloatTensor)
+        '''
+        return: gram, food_type, image
+        '''
 
         if self.on_memory:
-            img = self.img_tensors[idx]
+            gram = torch.tensor(self.gram_tensors[idx])
+            food_type = torch.tensor(self.food_type_tensors[idx])
+            img = torch.tensor(self.img_tensors[idx])
+            
         else:
+            gram = torch.tensor([self.meta_data.iloc[idx, 2]]).type(torch.FloatTensor)
+            food_type = torch.zeros(self.n_classes).type(torch.FloatTensor)
+            food_type[list(map(int, str(self.meta_data.iloc[idx, 1]).split()))] = 1.0
             img_path = os.path.join(self.img_dir, self.meta_data.iloc[idx, 3])
             img = read_image(img_path).float() / 255
 
 
         
         if self.cropper:
+            # cropper인 yolov7은 4차원의 입력을 받음 [batch_size, rgb, width, height]
+            # 또한 입력값은 0과 1사이의 값으로 정규화된 float tensor임.
+            # 따라서 cropping을 위해서 임시적으로 batch 차원을 추가해줘야함.
             img = self.cropper(img.unsqueeze(0))[0].squeeze()
                         
         if self.transform:
+            # transform은 uint8(0~255) type의 텐서만 입력으로 받을 수 있음.
             img = torch.clamp((img * 255), min=0, max=255).type(torch.uint8)
             img = self.transform(img)
 
@@ -75,7 +96,7 @@ class CustomDataset(Dataset):
         img = img.float() / 255
 
 
-        return weight.to(self.device), food_type.to(self.device), img.to(self.device)
+        return gram.to(self.device), food_type.to(self.device), img.to(self.device)
 
 
 
@@ -93,7 +114,7 @@ def make_hash(df: pd.DataFrame) -> pd.Series:
 def make_dataloaders(
     meta_data_path: str,
     img_dir: str,
-    n_classes: int,
+    num_classes: int,
     device: torch.device,
     test_size: float,
     batch_size: int,
@@ -122,9 +143,9 @@ def make_dataloaders(
         
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     train_dataset = CustomDataset(
-        train, img_dir, n_classes, device, transform=transform, cropper=cropper, resize=resize, on_memory=on_memory
+        train, img_dir, num_classes, device, transform=transform, cropper=cropper, resize=resize, on_memory=on_memory
     )
-    test_dataset = CustomDataset(test, img_dir, n_classes, device, cropper=cropper,  resize=resize, on_memory=on_memory)
+    test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,  resize=resize, on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
