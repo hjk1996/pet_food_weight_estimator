@@ -163,6 +163,7 @@ if __name__ == "__main__":
             on_memory=config["on_memory"],
             test_size=config["test_size"],
             batch_size=config["batch_size"],
+            num_workers=config['num_workers'],
             transform=T.AugMix(),
             cropper_weight_path=config.get("cropper_weight_path"),
             cropper_input_size=config.get("cropper_input_size"),
@@ -181,6 +182,7 @@ if __name__ == "__main__":
             on_memory=config["on_memory"],
             test_size=config["test_size"],
             batch_size=config["batch_size"],
+            num_workers=config['num_workers'],
             transform=T.AugMix(),
             resize=(config.get("resize"), config.get("resize")) if config.get("resize") else None,
         )

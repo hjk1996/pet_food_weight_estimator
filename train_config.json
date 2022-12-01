@@ -10,6 +10,7 @@
   "image_meta_data_path": "./data/image_meta_data.csv",
   "weight_path": null,
   "save_path": "./results",
+  "num_workers": 0,
   "cropper_weight_path": "./yolov7/weights/best.pt",
   "cropper_input_size": 416,
   "cropper_output_size": 256

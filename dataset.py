@@ -118,6 +118,7 @@ def make_dataloaders(
     device: torch.device,
     test_size: float,
     batch_size: int,
+    num_workers: int = 0,
     cropper_weight_path: str = None,
     cropper_input_size: int = None,
     cropper_output_size: int = None,
@@ -146,7 +147,7 @@ def make_dataloaders(
         train, img_dir, num_classes, device, transform=transform, cropper=cropper, resize=resize, on_memory=on_memory
     )
     test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,  resize=resize, on_memory=on_memory)
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+    train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
 
     return {"train": train_dataloader, "test": test_dataloader}
