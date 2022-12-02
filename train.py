@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     if config.get("cropper_weight_path") and config.get("cropper_input_size") and config.get("cropper_output_size"):
         dataloaders = make_dataloaders(
-            meta_data_path=config["image_meta_data_path"],
+            image_meta_data_path=config["image_meta_data_path"],
             img_dir=config["image_folder_path"],
             num_classes=config["num_classes"],
             device=device,
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
 
         dataloaders = make_dataloaders(
-            meta_data_path=config["image_meta_data_path"],
+            image_meta_data_path=config["image_meta_data_path"],
             img_dir=config["image_folder_path"],
             num_classes=config["num_classes"],
             device=device,
@@ -184,7 +184,6 @@ if __name__ == "__main__":
             batch_size=config["batch_size"],
             num_workers=config['num_workers'],
             transform=T.AugMix(),
-            resize=(config.get("resize"), config.get("resize")) if config.get("resize") else None,
         )
 
     model = make_swin_v2_based_estimator(

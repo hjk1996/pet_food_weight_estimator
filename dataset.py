@@ -11,6 +11,7 @@ from torchvision.transforms import Resize
 from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
 
 from models.yolo_wrapper import YOLOWrapper
 
@@ -24,7 +25,6 @@ class CustomDataset(Dataset):
         on_memory: bool = False,
         cropper: nn.Module = None,
         transform=None,
-        resize: Tuple[int, int] = None,
     ):
         self.meta_data = meta_data
         self.img_dir = img_dir
@@ -32,7 +32,6 @@ class CustomDataset(Dataset):
         self.n_classes = n_classes
         self.on_memory = on_memory
         self.cropper = cropper
-        self.resizer = Resize(resize) if resize else None
         self.device = device
         
         if on_memory:
@@ -90,8 +89,6 @@ class CustomDataset(Dataset):
             img = torch.clamp((img * 255), min=0, max=255).type(torch.uint8)
             img = self.transform(img)
 
-        if not self.cropper and self.resizer:
-            img = self.resizer(img)
 
         img = img.float() / 255
 
@@ -112,7 +109,7 @@ def make_hash(df: pd.DataFrame) -> pd.Series:
 
 
 def make_dataloaders(
-    meta_data_path: str,
+    image_meta_data_path: str,
     img_dir: str,
     num_classes: int,
     device: torch.device,
@@ -124,11 +121,10 @@ def make_dataloaders(
     cropper_output_size: int = None,
     on_memory: bool = False,
     transform=None,
-    resize: Tuple[int, int] = None,
     random_state: int = 1234,
     test_mode: bool = False
 ) -> dict:
-    meta_data = pd.read_csv(meta_data_path)
+    meta_data = pd.read_csv(image_meta_data_path)
     hash = make_hash(meta_data)
 
     train, test = train_test_split(
@@ -144,10 +140,42 @@ def make_dataloaders(
         
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     train_dataset = CustomDataset(
-        train, img_dir, num_classes, device, transform=transform, cropper=cropper, resize=resize, on_memory=on_memory
+        train, img_dir, num_classes, device, transform=transform, cropper=cropper,  on_memory=on_memory
     )
-    test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,  resize=resize, on_memory=on_memory)
+    test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,   on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
 
     return {"train": train_dataloader, "test": test_dataloader}
+
+def make_dataloaders_for_cv10(
+    image_meta_data_path: str,
+    img_dir: str,
+    num_classes: int,
+    device: torch.device,
+    batch_size: int,
+    num_workers: int = 0,
+    cropper_weight_path: str = None,
+    cropper_input_size: int = None,
+    cropper_output_size: int = None,
+    on_memory: bool = False,
+    transform=None,
+) -> List[dict]:
+    dataset_list = []
+    meta_data = pd.read_csv(image_meta_data_path)
+    hash = make_hash(meta_data)
+    cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
+    skf = StratifiedKFold(n_splits=10, )
+
+    for train_index, test_index in skf.split(meta_data, hash):
+        train = meta_data[train_index]
+        test = meta_data[test_index]
+        train_dataset = CustomDataset(
+            train, img_dir, num_classes, device, transform=transform, cropper=cropper,  on_memory=on_memory
+        )
+        test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,  on_memory=on_memory)
+        train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
+        test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
+        dataset_list.append({"train": train_dataloader, "test": test_dataloader})
+    
+    return dataset_list

@@ -28,6 +28,44 @@ class ModelConfig:
             feature_out_size=json_object["feature_out_size"],
         )
 
+@dataclass
+class TrainConfig:
+    epoch: int
+    batch_size: int
+    test_size: float
+    resize: int
+    model_name: str
+    num_classes: int
+    on_memory: bool
+    image_folder_path: str
+    image_meta_data_path: str
+    weight_path: str
+    save_path: str
+    num_workers: int
+    cropper_weight_path: str
+    cropper_input_size: int
+    cropper_output_size: int
+
+    @classmethod
+    def from_json(cls, json_object: dict):
+        return cls(
+            epoch=json_object['epoch'],
+            batch_size=json_object['batch_size'],
+            test_size=json_object['test_size'],
+            resize=json_object['resize'],
+            model_name=json_object['model_name'],
+            num_classes=json_object['num_classes'],
+            on_memory=json_object['on_memory'],
+            image_folder_path=json_object['image_folder_path'],
+            image_meta_data_path=json_object['image_meta_data_path'],
+            weight_path=json_object['weight_path'],
+            save_path=json_object['save_path'],
+            num_workers=json_object['num_workers'],
+            cropper_weight_path=json_object['cropper_weight_path'],
+            cropper_input_size=json_object['cropper_input_size'],
+            cropper_output_size=json_object['cropper_output_size']
+        )
+
 
 def load_model_config(model_name: str) -> ModelConfig:
     with open('model_configs.json', 'r') as f:

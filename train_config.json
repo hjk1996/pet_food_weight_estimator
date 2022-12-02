@@ -2,7 +2,6 @@
   "epoch": 500, 
   "batch_size": 16,
   "test_size": 0.2,
-  "resize": null,
   "model_name": "swinv2_tiny_window8_256",
   "num_classes": 21,
   "on_memory": false,
