@@ -13,7 +13,7 @@ import torchvision.transforms as T
 
 from loss_fn import MultiTaskLossWrapper
 from dataset import make_dataloaders
-from utils import save_model_weights, load_model_config, make_swin_v2_based_estimator
+from utils import save_model_weights, load_model_config, make_swin_v2_based_estimator,TrainConfig
 
 
 
@@ -26,27 +26,19 @@ def train_one_epoch(
     optimizer: Any,
 ):
     running_loss = 0.0
-    # running_mae = 0.0
     dataloader_len = len(dataloader)
 
-    for weight, food_type, img in dataloader:
+    for gram, food_type, img in dataloader:
         optimizer.zero_grad()
         preds = model(img)
-        loss = loss_fn(preds, (weight, food_type))
-        # mae = loss_fn.mae(preds[0], weight)
+        loss = loss_fn(preds, (gram, food_type))
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
-        # running_mae += mae.item()
 
     epoch_loss = running_loss / dataloader_len
-    # epoch_mae = running_mae / dataloader_len
-
     print(f"EPOCH[{epoch}] Train/Loss: {epoch_loss}")
-    # print(f"EPOCH[{epoch}] Train/MAE: {epoch_mae}")
-
     writer.add_scalar("Train/total_loss", epoch_loss, epoch)
-    # writer.add_scalar("Train/mae", epoch_mae, epoch)
 
 
 def evaluate_classification(gt: Tensor, pred_logit: Tensor) -> int:
@@ -67,12 +59,13 @@ def validate_one_epoch(
     right_count = 0
     dataloader_len = len(dataloader)
 
-    for weight, food_type, img in dataloader:
+    for gram, food_type, img in dataloader:
         with torch.no_grad():
             preds = model(img)
-            loss = loss_fn(preds, (weight, food_type))
+            loss = loss_fn(preds, (gram, food_type))
             running_loss += loss.item()
-            running_rmse += loss_fn.weight_loss_fn(preds[0], weight)
+            running_rmse += loss_fn.weight_loss_fn(preds[0], gram)
+            # 왜 right_count가 제대로 집계되지 않는지 확인해야함.
             right_count += evaluate_classification(food_type, preds[1])
 
     epoch_loss = running_loss / dataloader_len
@@ -80,7 +73,7 @@ def validate_one_epoch(
     epoch_acc = right_count / dataloader_len
 
     print(f"EPOCH[{epoch}] Val/Loss: {epoch_loss}")
-    print(f"EPOCH[{epoch}] Val/MAE: {epoch_rmse}")
+    print(f"EPOCH[{epoch}] Val/RMSE: {epoch_rmse}")
     print(f"EPOCH[{epoch}] Val/ACC: {epoch_acc}", "\n")
 
     writer.add_scalar("Valid/total_loss", epoch_loss, epoch)
@@ -150,6 +143,7 @@ if __name__ == "__main__":
     with open(args.train_config_path, "r") as f:
         config = json.load(f)
 
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     model_config = load_model_config(config["model_name"])
@@ -184,6 +178,7 @@ if __name__ == "__main__":
             batch_size=config["batch_size"],
             num_workers=config['num_workers'],
             transform=T.AugMix(),
+            test_mode=args.test_mode
         )
 
     model = make_swin_v2_based_estimator(

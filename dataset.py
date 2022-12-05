@@ -74,7 +74,7 @@ class CustomDataset(Dataset):
             food_type = torch.zeros(self.n_classes).type(torch.FloatTensor)
             food_type[list(map(int, str(self.meta_data.iloc[idx, 1]).split()))] = 1.0
             img_path = os.path.join(self.img_dir, self.meta_data.iloc[idx, 3])
-            img = read_image(img_path).float() / 255
+            img = read_image(img_path) 
 
 
         
@@ -82,13 +82,13 @@ class CustomDataset(Dataset):
             # cropper인 yolov7은 4차원의 입력을 받음 [batch_size, rgb, width, height]
             # 또한 입력값은 0과 1사이의 값으로 정규화된 float tensor임.
             # 따라서 cropping을 위해서 임시적으로 batch 차원을 추가해줘야함.
+            img = img.float() / 255
             img = self.cropper(img.unsqueeze(0))[0].squeeze()
-                        
+            img = torch.clamp((img * 255), min=0, max=255).type(torch.uint8)
+        
         if self.transform:
             # transform은 uint8(0~255) type의 텐서만 입력으로 받을 수 있음.
-            img = torch.clamp((img * 255), min=0, max=255).type(torch.uint8)
             img = self.transform(img)
-
 
         img = img.float() / 255
 

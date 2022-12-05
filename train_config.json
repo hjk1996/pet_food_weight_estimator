@@ -1,5 +1,5 @@
 {
-  "epoch": 500, 
+  "epoch": 500,
   "batch_size": 16,
   "test_size": 0.2,
   "model_name": "swinv2_tiny_window8_256",
@@ -10,7 +10,7 @@
   "weight_path": null,
   "save_path": "./results",
   "num_workers": 0,
-  "cropper_weight_path": "./yolov7/weights/best.pt",
-  "cropper_input_size": 416,
-  "cropper_output_size": 256
+  "cropper_weight_path": null,
+  "cropper_input_size": null,
+  "cropper_output_size": null
 }
