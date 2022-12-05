@@ -22,6 +22,7 @@ class YOLOWrapper(nn.Module):
         '''
         return: 
             images [batch, 3, w, h]
+
             has_bowl [batch, 1]
 
         '''
@@ -47,7 +48,46 @@ class YOLOWrapper(nn.Module):
                     has_bowl[i, 0] = True
         
         return images, has_bowl
+    
+    def get_miou(self, image_tensor: torch.tensor, box_coords: torch.tensor) -> float:
+        '''
+        input:
 
+            image_tensor: [batch_size, 3, width, hegiht]
+
+            box_coords: [batch_size, xywh]
+
+            하나의 이미지에는 하나의 좌표값만 부여됨.
+
+            좌표값이 없는 이미지는 없음 (이미지에 그릇 사진이 무조건 있음)
+        
+
+        output:
+
+            mIoU: float [0,1]
+        '''
+
+
+        with torch.no_grad():
+            preds, _ = self.model(image_tensor)
+            preds = self.non_max_suppression(preds, max_det=1)
+            results = []
+        
+            for i, pred in enumerate(preds):
+                if pred.shape[0] == 0:
+                    results.append(0)
+                else:
+                    self.clip_coords(pred[:, :4], (self.img_size, self.img_size))
+                    x1, y1, x2, y2 = pred[:, :4].round().int().view(-1).tolist()
+                    pred_box_area = self.box_area((x1, y1, x2 ,y2))
+                    real_box_coords = self.xywh2xyxy(box_coords[i]) * self.img_size
+                    real_box_area = self.box_area(real_box_coords)
+                    iou = self.box_iou(pred_box_area, real_box_area)
+                    results.append(iou)
+        
+        return sum(results) / image_tensor.shape[0]
+            
+  
 
     def non_max_suppression(self, prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False, max_det=300,
                         labels=()):
@@ -148,6 +188,10 @@ class YOLOWrapper(nn.Module):
         
         
         return output
+
+    @staticmethod
+    def box_area(box):
+        return (box[2] - box[0]) * (box[3] - box[1])
 
     @staticmethod
     def box_iou(box1, box2):
