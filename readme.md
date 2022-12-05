@@ -41,8 +41,8 @@ train_config.json을 통해 훈련에 필요한 변수들을 설정합니다.
 |cropper_input_size|yolov7의 입력으로 들어가는 이미지 크기|null|
 |cropper_output_size|yolov7의 출력(crop된 이미지) 이미지의 크기|null|
    
-훈련 및 검증에 사용할 이미지 담고 있는 images 폴더와   
-개별 이미지에 대한 정보를 담고 있는 image_meta_data.csv 파일을 data 폴더에 배치합니다.
+훈련과 검증을 위해서 모든 이미지가 저장되어 있는 images 폴더와   
+개별 이미지에 대한 메타 정보를 담고 있는 image_meta_data.csv 파일이 필요합니다.
   ```
   root
   │   
@@ -68,19 +68,15 @@ train과 관련된 설정이 저장된 json 파일의 경로를 전달합니다.
 python train.py --train_config_path <train_config file path>
 ```
   
-학습 과정에서 설정할 수 있는 파라미터는 다음과 같습니다.  
-학습 결과는 train_confing.json에서 설정한 save_path 경로에 저장됩니다.
+학습 결과는 train_confing.json에서 설정한 save_path로 지정한 경로에 저장됩니다.
 ```
-root
+<save_path>
 │   
 │   
-└───<save_path>
-    │   
-    │   
-    └───2022-11-03_10-37-07
-        └───log (훈련 log가 저장되는 폴더)
-        └───best.pt (최고 성능을 기록한 모델 가중치)
-        └───last.pt (훈련 종료 시점 모델 가중치)
+└───2022-11-03_10-37-07
+    └───log (훈련 log가 저장되는 폴더)
+    └───best.pt (최고 성능을 기록한 모델 가중치)
+    └───last.pt (훈련 종료 시점 모델 가중치)
 ```
   
 ## 학습 결과 확인
