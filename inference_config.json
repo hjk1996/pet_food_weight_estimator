@@ -1,0 +1,6 @@
+{
+  "weight_path": "./model_weights/best.pt",
+  "model_name": "swinv2_tiny_window8_256",
+  "num_classes": 21,
+  "mapping_path": "./data/indice_name_mapping.json"
+}

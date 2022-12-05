@@ -66,6 +66,21 @@ class TrainConfig:
             cropper_output_size=json_object['cropper_output_size']
         )
 
+@dataclass
+class InferenceConfig:
+    model_name: str
+    weight_path: str
+    num_classes: int
+    mapping_path: str
+
+    @classmethod
+    def from_json(cls, json_object:dict):
+        return cls(
+            model_name=json_object['model_name'],
+            weight_path=json_object['weight_path'],
+            num_classes=json_object['num_classes'],
+            mapping_path=json_object['mapping_path']
+        ) 
 
 def load_model_config(model_name: str) -> ModelConfig:
     with open('model_configs.json', 'r') as f:

@@ -43,7 +43,7 @@ class CustomDataset(Dataset):
         self.gram_tensors = []
 
         for i in range(len(self.meta_data)):
-            img_tensor = read_image(os.path.join(self.img_dir, self.meta_data.iloc[i, 2])).float() / 255
+            img_tensor = read_image(os.path.join(self.img_dir, self.meta_data.iloc[i, 3])).float() / 255
             self.img_tensors.append(img_tensor)
 
             food_type_tensor = torch.zeros(self.n_classes).type(torch.FloatTensor)

@@ -1,10 +1,7 @@
 from typing import Tuple
 
-import torch
 from torch import Tensor
 import torch.nn as nn
-from torchvision.transforms import Resize
-import timm
 
 
 class SwinV2BasedEstimator(nn.Module):
