@@ -188,9 +188,6 @@ class YOLOWrapper(nn.Module):
         
         return output
 
-    @staticmethod
-    def box_area(box):
-        return (box[2] - box[0]) * (box[3] - box[1])
 
     @staticmethod
     def box_iou(box1, box2):
