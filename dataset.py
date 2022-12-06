@@ -15,7 +15,42 @@ from sklearn.model_selection import StratifiedKFold
 
 from models.yolo_wrapper import YOLOWrapper
 
-class CustomDataset(Dataset):
+class YOLODataset(Dataset):
+    def __init__(
+        self,
+        img_dir: str,
+        label_dir: str,
+        device: torch.device,
+        on_memory: bool = False,
+    ):
+        self.img_dir = glob(os.path.join(img_dir, '*.jpg'))
+        self.label_dir = label_dir
+        self.get_coords()
+        self.on_memory = on_memory
+        self.device = device
+
+    def __len__(self):
+        return len(self.img_dir)
+    
+    def __getitem__(self, i):
+        '''
+            return
+                
+                img_tensor: [3, width, height]
+                coords_tensor: [xyxy]
+        '''
+        img_tensor = read_image(self.img_dir[i]).float() / 255
+        coords_tensor = self.coords_map[os.path.basename(self.img_dir[i]).split('.')[0]]
+        return img_tensor, coords_tensor
+
+    def get_coords(self):
+        self.coords_map = {}
+        labels_file_paths = glob(os.path.join(self.label_dir, "*.txt"))
+        for path in labels_file_paths:
+            with open(path, 'r') as f:
+                self.coords[os.path.basename(path).split('.')[0]] = torch.tensor(list(map(float, f.readline().split()[1:])))
+
+class DogFoodDataset(Dataset):
     def __init__(
         self,
         meta_data: pd.DataFrame,
@@ -139,10 +174,10 @@ def make_dataloaders(
         test = test.iloc[: 32, :]
         
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
-    train_dataset = CustomDataset(
+    train_dataset = DogFoodDataset(
         train, img_dir, num_classes, device, transform=transform, cropper=cropper,  on_memory=on_memory
     )
-    test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,   on_memory=on_memory)
+    test_dataset = DogFoodDataset(test, img_dir, num_classes, device, cropper=cropper,   on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
 
@@ -170,10 +205,10 @@ def make_dataloaders_for_cv10(
     for train_index, test_index in skf.split(meta_data, hash):
         train = meta_data[train_index]
         test = meta_data[test_index]
-        train_dataset = CustomDataset(
+        train_dataset = DogFoodDataset(
             train, img_dir, num_classes, device, transform=transform, cropper=cropper,  on_memory=on_memory
         )
-        test_dataset = CustomDataset(test, img_dir, num_classes, device, cropper=cropper,  on_memory=on_memory)
+        test_dataset = DogFoodDataset(test, img_dir, num_classes, device, cropper=cropper,  on_memory=on_memory)
         train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
         test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
         dataset_list.append({"train": train_dataloader, "test": test_dataloader})

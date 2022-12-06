@@ -59,33 +59,32 @@ class YOLOWrapper(nn.Module):
 
             하나의 이미지에는 하나의 좌표값만 부여됨.
 
-            좌표값이 없는 이미지는 없음 (이미지에 그릇 사진이 무조건 있음)
+            좌표값이 없는 이미지는 없음 (이미지에 개밥그릇 사진이 무조건 있어야함.)
         
 
         output:
 
             mIoU: float [0,1]
         '''
-
+        assert(image_tensor.shape[0] == box_coords.shape[0])
 
         with torch.no_grad():
             preds, _ = self.model(image_tensor)
+            # preds는 각 배치에 대한 예측 결과를 담은 리스트임
+            # 즉, preds의 length는 배치 사이즈와 같음.
             preds = self.non_max_suppression(preds, max_det=1)
-            results = []
+            ious = []
         
             for i, pred in enumerate(preds):
                 if pred.shape[0] == 0:
-                    results.append(0)
+                    ious.append(0)
                 else:
-                    self.clip_coords(pred[:, :4], (self.img_size, self.img_size))
-                    x1, y1, x2, y2 = pred[:, :4].round().int().view(-1).tolist()
-                    pred_box_area = self.box_area((x1, y1, x2 ,y2))
-                    real_box_coords = self.xywh2xyxy(box_coords[i]) * self.img_size
-                    real_box_area = self.box_area(real_box_coords)
-                    iou = self.box_iou(pred_box_area, real_box_area)
-                    results.append(iou)
+                    self.clip_coords(pred[:, :4], (self.img_size, self.img_size)) 
+                    real_box_coords = self.xywh2xyxy(box_coords[i].unsqueeze(0)) * self.img_size
+                    iou = self.box_iou(pred[:, :4], real_box_coords).squeeze().item()
+                    ious.append(iou)
         
-        return sum(results) / image_tensor.shape[0]
+        return sum(ious) / image_tensor.shape[0]
             
   
 
@@ -208,6 +207,7 @@ class YOLOWrapper(nn.Module):
         """
 
         def box_area(box):
+            # box: (x, y, x, y)
             # box = 4xn
             return (box[2] - box[0]) * (box[3] - box[1])
 

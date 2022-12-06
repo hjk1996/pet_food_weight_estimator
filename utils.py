@@ -102,13 +102,14 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
-def load_image_as_tensor(path: str, resize: int = None) -> Tensor:
+def load_image_as_tensor(path: str, resize: int = None, batch_dim: bool = True) -> Tensor:
     img = read_image(path)
     if resize:
         img = Resize((resize, resize))(img)
     img = img.type(FloatTensor) / 255.0
-    img = img.unsqueeze(0)
-    return img
+    
+    return img.unsqueeze(0) if batch_dim else img
+
 
 
 def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
