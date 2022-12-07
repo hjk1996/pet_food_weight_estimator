@@ -119,8 +119,8 @@ def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
 
 
 def make_swin_v2_based_estimator(
-    device: torch.device,
     model_config: ModelConfig,
+    cpu: bool = False,
     num_classes: int = 21,
 ) -> nn.Module:
 
@@ -132,9 +132,9 @@ def make_swin_v2_based_estimator(
         feature_out_size=model_config.feature_out_size,
         linear_hidden_size=model_config.feature_out_size,
         num_classes=num_classes,
+        cpu=cpu
     )
     
-    if device.type == 'cuda':
-        model = model.cuda()
+    model = model.cpu() if cpu else model.cuda()
 
     return model

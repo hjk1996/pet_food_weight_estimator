@@ -140,6 +140,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
     parser.add_argument('--test_mode', action="store_true")
+    parser.add_argument('--cpu', type=bool, default=False,)
     args = parser.parse_args()
 
     with open(args.train_config_path, "r") as f:
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     if train_config.num_workers:
         torch.multiprocessing.set_start_method('spawn')
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model_config = load_model_config(train_config.model_name)
 
@@ -183,9 +184,9 @@ if __name__ == "__main__":
         )
 
     model = make_swin_v2_based_estimator(
-        device=device,
         model_config=model_config,
         num_classes=train_config.num_classes,
+        cpu=args.cpu
     )
 
     if train_config.weight_path:
