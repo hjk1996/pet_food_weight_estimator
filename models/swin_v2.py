@@ -11,14 +11,12 @@ class SwinV2BasedEstimator(nn.Module):
         backbone: nn.Module,
         feature_out_size: int,
         linear_hidden_size: int,
-        cpu: bool = False,
         num_classes: int = 0,
     ):
         super().__init__()
         self.backbone = backbone
         self.feature_out_size = feature_out_size
         self.linear_hidden_size = linear_hidden_size
-        self.cpu = cpu
         self.num_classes = num_classes
 
         self.estimator = nn.Sequential(

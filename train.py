@@ -148,7 +148,8 @@ if __name__ == "__main__":
     if train_config.num_workers:
         torch.multiprocessing.set_start_method('spawn')
 
-    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    device = torch.device("cpu" if args.cpu else "cuda:0")
 
     model_config = load_model_config(train_config.model_name)
 
