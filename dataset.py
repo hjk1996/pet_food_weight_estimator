@@ -170,8 +170,8 @@ def make_dataloaders(
     )
 
     if test_mode:
-        train = train.iloc[: 256, :]
-        test = test.iloc[: 32, :]
+        train = train.iloc[:128, :]
+        test = test.iloc[:64, :]
         
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     train_dataset = DogFoodDataset(
@@ -204,8 +204,13 @@ def make_dataloaders_for_cv10(
     skf = StratifiedKFold(n_splits=10, )
 
     for train_index, test_index in skf.split(meta_data, hash):
-        train = meta_data[train_index] if not test_mode else meta_data[train_index][:128]
-        test = meta_data[test_index] if not test_mode else meta_data[test_index][:128]
+        train = meta_data[train_index]
+        test = meta_data[test_index]
+        
+        if test_mode:
+            train = train[:128]
+            test = test[:64]
+            
         train_dataset = DogFoodDataset(
             train, img_dir, num_classes, device, transform=transform, cropper=cropper,  on_memory=on_memory
         )
