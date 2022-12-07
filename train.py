@@ -158,7 +158,7 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            cpu=args.cpu,
+            device=device,
             on_memory=train_config.on_memory,
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
@@ -176,7 +176,7 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            cpu=args.cpu,
+            device=device,
             on_memory=train_config.on_memory,
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
@@ -188,8 +188,7 @@ if __name__ == "__main__":
     model = make_swin_v2_based_estimator(
         model_config=model_config,
         num_classes=train_config.num_classes,
-        cpu=args.cpu
-    )
+    ).to(device)
 
     if train_config.weight_path:
         model.load_state_dict(torch.load(train_config.weight_path))

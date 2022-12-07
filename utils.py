@@ -118,20 +118,18 @@ def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
 
 def make_swin_v2_based_estimator(
     model_config: ModelConfig,
-    device: torch.device,
     num_classes: int = 21,
 ) -> nn.Module:
 
     backbone = timm.create_model(model_config.name)
     backbone.head = None
 
-    model = SwinV2BasedEstimator(
+    return SwinV2BasedEstimator(
         backbone=backbone,
         feature_out_size=model_config.feature_out_size,
         linear_hidden_size=model_config.feature_out_size,
         num_classes=num_classes,
-    ).to(device)
+    )
     
     
 
-    return model

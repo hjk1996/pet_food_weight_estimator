@@ -31,7 +31,7 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            cpu=args.cpu,
+            device=device,
             on_memory=train_config.on_memory,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
@@ -47,6 +47,7 @@ if __name__ == "__main__":
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
             on_memory=train_config.on_memory,
+            device=device,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
             transform=T.AugMix(),
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     
 
     for dataloaders in dataset_list:
-        model = make_swin_v2_based_estimator(model_config=model_config, cpu=args.cpu, num_classes=train_config.num_classes)
+        model = make_swin_v2_based_estimator(model_config=model_config,num_classes=train_config.num_classes).to(device)
 
         train_and_valid(
             model=model,
