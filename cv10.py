@@ -11,6 +11,7 @@ from train import train_and_valid
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
+    parser.add_argument("--test_mode", action='store_true')
     args = parser.parse_args()
 
     with open(args.train_config_path, "r") as f:
@@ -33,7 +34,8 @@ if __name__ == "__main__":
             transform=T.AugMix(),
             cropper_weight_path=train_config.cropper_weight_path,
             cropper_input_size=train_config.cropper_input_size,
-            cropper_output_size=train_config.cropper_output_size
+            cropper_output_size=train_config.cropper_output_size,
+            test_mode=args.test_mode
         )
     else:
         dataset_list = make_dataloaders_for_cv10(
@@ -45,6 +47,7 @@ if __name__ == "__main__":
             batch_size=train_config.batch_size,
             num_workers=train_config.num_classes,
             transform=T.AugMix(),
+            test_mode=args.test_mode
         )
     
 

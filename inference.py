@@ -15,6 +15,7 @@ from utils import (
 )
 
 
+
 def inference_on_one_image(
     model_config: ModelConfig,
     image_path: str,

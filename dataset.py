@@ -195,6 +195,7 @@ def make_dataloaders_for_cv10(
     cropper_output_size: int = None,
     on_memory: bool = False,
     transform=None,
+    test_mode: bool = False
 ) -> List[dict]:
     dataset_list = []
     meta_data = pd.read_csv(image_meta_data_path)
@@ -203,8 +204,8 @@ def make_dataloaders_for_cv10(
     skf = StratifiedKFold(n_splits=10, )
 
     for train_index, test_index in skf.split(meta_data, hash):
-        train = meta_data[train_index]
-        test = meta_data[test_index]
+        train = meta_data[train_index] if not test_mode else meta_data[train_index][:128]
+        test = meta_data[test_index] if not test_mode else meta_data[test_index][:128]
         train_dataset = DogFoodDataset(
             train, img_dir, num_classes, device, transform=transform, cropper=cropper,  on_memory=on_memory
         )
