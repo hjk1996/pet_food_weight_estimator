@@ -148,7 +148,7 @@ if __name__ == "__main__":
     if train_config.num_workers:
         torch.multiprocessing.set_start_method('spawn')
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model_config = load_model_config(train_config.model_name)
 
@@ -157,7 +157,6 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            device=device,
             on_memory=train_config.on_memory,
             test_size=train_config.test_size,
             batch_size=train_config.test_size,
@@ -167,7 +166,6 @@ if __name__ == "__main__":
             cropper_input_size=train_config.cropper_input_size,
             cropper_output_size=train_config.cropper_output_size,
             test_mode=args.test_mode
-
         )       
     else:
 
@@ -176,7 +174,6 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            device=device,
             on_memory=train_config.on_memory,
             test_size=train_config.test_size,
             batch_size=train_config.test_size,
