@@ -17,6 +17,9 @@ if __name__ == "__main__":
     with open(args.train_config_path, "r") as f:
         train_config = TrainConfig.from_json(json.load(f))
 
+    if train_config.num_workers:
+        torch.multiprocessing.set_start_method('spawn')
+
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     model_config = load_model_config(train_config.model_name)
@@ -30,7 +33,7 @@ if __name__ == "__main__":
             device=device,
             on_memory=train_config.on_memory,
             batch_size=train_config.batch_size,
-            num_workers=train_config.num_classes,
+            num_workers=train_config.num_workers,
             transform=T.AugMix(),
             cropper_weight_path=train_config.cropper_weight_path,
             cropper_input_size=train_config.cropper_input_size,
@@ -45,7 +48,7 @@ if __name__ == "__main__":
             device=device,
             on_memory=train_config.on_memory,
             batch_size=train_config.batch_size,
-            num_workers=train_config.num_classes,
+            num_workers=train_config.num_workers,
             transform=T.AugMix(),
             test_mode=args.test_mode
         )

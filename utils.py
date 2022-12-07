@@ -132,5 +132,9 @@ def make_swin_v2_based_estimator(
         feature_out_size=model_config.feature_out_size,
         linear_hidden_size=model_config.feature_out_size,
         num_classes=num_classes,
-    ).to(device)
+    )
+    
+    if device.type == 'cuda':
+        model = model.cuda()
+
     return model

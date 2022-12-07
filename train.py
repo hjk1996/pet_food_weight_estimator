@@ -143,27 +143,29 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with open(args.train_config_path, "r") as f:
-        config = json.load(f)
+        train_config = TrainConfig.from_json(json.load(f))
 
+    if train_config.num_workers:
+        torch.multiprocessing.set_start_method('spawn')
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    model_config = load_model_config(config["model_name"])
+    model_config = load_model_config(train_config.model_name)
 
-    if config.get("cropper_weight_path") and config.get("cropper_input_size") and config.get("cropper_output_size"):
+    if train_config.cropper_weight_path and train_config.cropper_input_size and train_config.cropper_output_size:
         dataloaders = make_dataloaders(
-            image_meta_data_path=config["image_meta_data_path"],
-            img_dir=config["image_folder_path"],
-            num_classes=config["num_classes"],
+            image_meta_data_path=train_config.image_meta_data_path,
+            img_dir=train_config.image_folder_path,
+            num_classes=train_config.num_classes,
             device=device,
-            on_memory=config["on_memory"],
-            test_size=config["test_size"],
-            batch_size=config["batch_size"],
-            num_workers=config['num_workers'],
+            on_memory=train_config.on_memory,
+            test_size=train_config.test_size,
+            batch_size=train_config.test_size,
+            num_workers=train_config.num_workers,
             transform=T.AugMix(),
-            cropper_weight_path=config.get("cropper_weight_path"),
-            cropper_input_size=config.get("cropper_input_size"),
-            cropper_output_size=config.get("cropper_output_size"),
+            cropper_weight_path=train_config.cropper_weight_path,
+            cropper_input_size=train_config.cropper_input_size,
+            cropper_output_size=train_config.cropper_output_size,
             test_mode=args.test_mode
 
         )       
@@ -171,14 +173,14 @@ if __name__ == "__main__":
 
 
         dataloaders = make_dataloaders(
-            image_meta_data_path=config["image_meta_data_path"],
-            img_dir=config["image_folder_path"],
-            num_classes=config["num_classes"],
+            image_meta_data_path=train_config.image_meta_data_path,
+            img_dir=train_config.image_folder_path,
+            num_classes=train_config.num_classes,
             device=device,
-            on_memory=config["on_memory"],
-            test_size=config["test_size"],
-            batch_size=config["batch_size"],
-            num_workers=config['num_workers'],
+            on_memory=train_config.on_memory,
+            test_size=train_config.test_size,
+            batch_size=train_config.test_size,
+            num_workers=train_config.num_workers,
             transform=T.AugMix(),
             test_mode=args.test_mode
         )
@@ -186,15 +188,15 @@ if __name__ == "__main__":
     model = make_swin_v2_based_estimator(
         device=device,
         model_config=model_config,
-        num_classes=config["num_classes"],
+        num_classes=train_config.num_classes,
     )
 
-    if config.get("weight_path"):
-        model.load_state_dict(torch.load(config.get("weight_path")))
+    if train_config.weight_path:
+        model.load_state_dict(torch.load(train_config.weight_path))
 
     train_and_valid(
         model=model,
         dataloaders=dataloaders,
-        n_epochs=config["epoch"],
-        save_path=config["save_path"],
+        n_epochs=train_config.epoch,
+        save_path=train_config.save_path,
     )

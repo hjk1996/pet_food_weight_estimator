@@ -1,5 +1,6 @@
 from typing import Tuple
 
+import torch
 from torch import Tensor
 import torch.nn as nn
 
@@ -10,12 +11,14 @@ class SwinV2BasedEstimator(nn.Module):
         backbone: nn.Module,
         feature_out_size: int,
         linear_hidden_size: int,
+        device: torch.device,
         num_classes: int = 0,
     ):
         super().__init__()
         self.backbone = backbone
         self.feature_out_size = feature_out_size
         self.linear_hidden_size = linear_hidden_size
+        self.device = device
         self.num_classes = num_classes
 
         self.estimator = nn.Sequential(
@@ -60,7 +63,9 @@ class SwinV2BasedEstimator(nn.Module):
         )
     
         
-    def forward_feature(self, x) -> Tensor:
+    def forward_feature(self, x: Tensor) -> Tensor:
+        if self.device.type == 'cuda':
+            x = x.cuda()
         feature_map = self.backbone.forward_features(x)
         feature_map = feature_map.mean(1)
         return feature_map
