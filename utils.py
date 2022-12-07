@@ -33,7 +33,6 @@ class TrainConfig:
     epoch: int
     batch_size: int
     test_size: float
-    resize: int
     model_name: str
     num_classes: int
     on_memory: bool
@@ -52,7 +51,6 @@ class TrainConfig:
             epoch=json_object['epoch'],
             batch_size=json_object['batch_size'],
             test_size=json_object['test_size'],
-            resize=json_object['resize'],
             model_name=json_object['model_name'],
             num_classes=json_object['num_classes'],
             on_memory=json_object['on_memory'],

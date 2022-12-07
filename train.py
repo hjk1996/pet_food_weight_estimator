@@ -67,7 +67,6 @@ def validate_one_epoch(
             loss = loss_fn(preds, (gram, food_type))
             running_loss += loss.item()
             running_rmse += loss_fn.weight_loss_fn(preds[0], gram)
-            # 왜 right_count가 제대로 집계되지 않는지 확인해야함.
             right_count += evaluate_classification(food_type, preds[1])
 
     epoch_loss = running_loss / dataloader_len
