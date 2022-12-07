@@ -11,6 +11,7 @@ from train import train_and_valid
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
+    parser.add_argument('--cpu', type=bool, default=False,)
     parser.add_argument("--test_mode", action='store_true')
     args = parser.parse_args()
 
@@ -20,7 +21,6 @@ if __name__ == "__main__":
     if train_config.num_workers:
         torch.multiprocessing.set_start_method('spawn')
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model_config = load_model_config(train_config.model_name)
 
@@ -30,6 +30,7 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
+            cpu=args.cpu,
             on_memory=train_config.on_memory,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
@@ -53,7 +54,7 @@ if __name__ == "__main__":
     
 
     for dataloaders in dataset_list:
-        model = make_swin_v2_based_estimator(device=device, model_config=model_config, num_classes=train_config.num_classes)
+        model = make_swin_v2_based_estimator(model_config=model_config, cpu=args.cpu, num_classes=train_config.num_classes)
 
         train_and_valid(
             model=model,

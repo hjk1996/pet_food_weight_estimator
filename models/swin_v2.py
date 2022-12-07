@@ -64,7 +64,6 @@ class SwinV2BasedEstimator(nn.Module):
     
         
     def forward_feature(self, x: Tensor) -> Tensor:
-        x = x.cpu() if self.cpu else x.cuda()
         feature_map = self.backbone.forward_features(x)
         feature_map = feature_map.mean(1)
         return feature_map
