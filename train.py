@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 from typing import Any
 import json
+import time
+
 
 import argparse
 import torch
@@ -14,6 +16,7 @@ import torchvision.transforms as T
 from loss_fn import MultiTaskLossWrapper
 from dataset import make_dataloaders
 from utils import save_model_weights, load_model_config, make_swin_v2_based_estimator,TrainConfig
+
 
 
 
@@ -59,9 +62,11 @@ def validate_one_epoch(
     running_loss = 0.0
     running_rmse = 0.0
     right_count = 0
+    data_length = 0
     dataloader_len = len(dataloader)
 
     for gram, food_type, img in dataloader:
+        data_length += gram.shape[0]
         with torch.no_grad():
             preds = model(img)
             loss = loss_fn(preds, (gram, food_type))
@@ -71,11 +76,11 @@ def validate_one_epoch(
 
     epoch_loss = running_loss / dataloader_len
     epoch_rmse = running_rmse / dataloader_len
-    epoch_acc = right_count / dataloader_len
+    epoch_acc = right_count / data_length
 
     print(f"EPOCH[{epoch}] Val/Loss: {epoch_loss}")
     print(f"EPOCH[{epoch}] Val/RMSE: {epoch_rmse}")
-    print(f"EPOCH[{epoch}] Val/ACC: {epoch_acc}", "\n")
+    print(f"EPOCH[{epoch}] Val/ACC: {epoch_acc}")
 
     writer.add_scalar("Valid/total_loss", epoch_loss, epoch)
     writer.add_scalar("Valid/rmse", epoch_rmse, epoch)
@@ -100,6 +105,7 @@ def train_and_valid(
     writer = SummaryWriter(os.path.join(save_path, "log"))
 
     for i in range(n_epochs):
+        start = time.time()
         for phase in ["train", "test"]:
 
             dataloader = dataloaders[phase]
@@ -128,11 +134,14 @@ def train_and_valid(
                     best_mae = epoch_mae
                     best_weights = model.state_dict()
                     save_model_weights(model.state_dict(), save_path, best=True)
+        end = time.time()
+        print(f"EPOCH[{i}] took {end - start:.2f} seconds", "\n")
 
     writer.close()
     save_model_weights(best_weights, save_path, best=False)
 
     return writer
+
 
 
 if __name__ == "__main__": 

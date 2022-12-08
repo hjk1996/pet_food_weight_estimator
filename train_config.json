@@ -1,5 +1,5 @@
 {
-  "epoch": 500,
+  "epoch": 2,
   "batch_size": 16,
   "test_size": 0.2,
   "model_name": "swinv2_tiny_window8_256",

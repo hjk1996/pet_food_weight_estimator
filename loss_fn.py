@@ -6,6 +6,7 @@ import torch.nn as nn
 class RMSELoss(nn.Module):
     def __init__(self):
         super().__init__()
+        # 손실값 계산할 때 평균값으로 계산함.
         self.mse = nn.MSELoss()
 
     def forward(self, yhat, y) -> Tensor:
