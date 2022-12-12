@@ -33,5 +33,10 @@
     "name": "swinv2_large_window12to16_192to256_22kft1k",
     "resolution": 256,
     "feature_out_size": 1536
+  },
+  "efficientnetv2_s": {
+    "name": "efficientnetv2_s",
+    "resolution": 224,
+    "feature_out_size": 1280
   }
 }

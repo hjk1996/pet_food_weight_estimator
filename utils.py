@@ -12,6 +12,7 @@ from torchvision.transforms import Resize
 import timm
 
 from models.swin_v2 import SwinV2BasedEstimator
+from models.efficient_net import EfficientNetBasedModel
 
 
 @dataclass
@@ -130,6 +131,20 @@ def make_swin_v2_based_estimator(
         linear_hidden_size=model_config.feature_out_size,
         num_classes=num_classes,
     )
-    
+
+def make_efficient_net_based_estimator(
+    model_config: ModelConfig,
+    num_classes: int = 21,
+) -> nn.Module:
+
+    backbone = timm.create_model(model_config.name)
+    backbone.head = None
+
+    return EfficientNetBasedModel(
+        backbone=backbone,
+        feature_out_size=model_config.feature_out_size,
+        linear_hidden_size=model_config.feature_out_size,
+        num_classes=num_classes,
+    )
     
 
