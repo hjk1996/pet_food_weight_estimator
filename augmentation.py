@@ -10,11 +10,9 @@ def kim_aug():
                             transforms.RandomRotation(degrees=(-30, 30))]),
                             p=0.3)          
 
-    train_transform = transforms.Compose([
+    return transforms.Compose([
                             transforms.RandomHorizontalFlip(),
                             random_apply1,
                             random_apply2,
                             ])
 
-
-    return train_transform    

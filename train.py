@@ -15,6 +15,7 @@ import torchvision.transforms as T
 from loss_fn import MultiTaskLossWrapper
 from dataset import make_dataloaders
 from utils import save_model_weights, load_model_config, make_estimator,TrainConfig
+from augmentation import kim_aug
 
 
 
@@ -171,7 +172,7 @@ if __name__ == "__main__":
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
-            train_transform=T.AugMix(),
+            train_transform=kim_aug(),
             cropper_weight_path=train_config.cropper_weight_path,
             cropper_input_size=train_config.cropper_input_size,
             cropper_output_size=train_config.cropper_output_size,
@@ -189,7 +190,7 @@ if __name__ == "__main__":
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
-            train_transform=T.AugMix(),
+            train_transform=kim_aug(),
             test_mode=args.test_mode
         )
 
