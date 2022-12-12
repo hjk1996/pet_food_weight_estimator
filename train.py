@@ -14,7 +14,7 @@ import torchvision.transforms as T
 
 from loss_fn import MultiTaskLossWrapper
 from dataset import make_dataloaders
-from utils import save_model_weights, load_model_config, make_swin_v2_based_estimator,TrainConfig
+from utils import save_model_weights, load_model_config, make_estimator,TrainConfig
 
 
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
             test_mode=args.test_mode
         )
 
-    model = make_swin_v2_based_estimator(
+    model = make_estimator(
         model_config=model_config,
         num_classes=train_config.num_classes,
     ).to(device)

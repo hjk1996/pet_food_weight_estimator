@@ -6,7 +6,7 @@ import torch
 
 from utils import (
     load_image_as_tensor,
-    make_swin_v2_based_estimator,
+    _make_swin_v2_based_estimator,
     get_class_prediction_from_logit,
     load_model_config,
     InferenceConfig,
@@ -27,7 +27,7 @@ def inference_on_one_image(
     print(f"{image_path}에 대한 예측 시작..\n")
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     img = load_image_as_tensor(image_path, resize=resize)
-    model = make_swin_v2_based_estimator(device=device, model_config=model_config,num_classes=num_classes).to(device)
+    model = _make_swin_v2_based_estimator(device=device, model_config=model_config,num_classes=num_classes).to(device)
     model.load_state_dict(torch.load(weight_path))
 
     weight, class_logit = model(img)

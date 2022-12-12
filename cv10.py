@@ -4,7 +4,7 @@ import argparse
 import torch
 import torchvision.transforms as T
 
-from utils import load_model_config, TrainConfig, make_swin_v2_based_estimator
+from utils import load_model_config, TrainConfig, make_estimator
 from dataset import make_dataloaders_for_cv10
 from train import train_and_valid
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     
 
     for dataloaders in dataset_list:
-        model = make_swin_v2_based_estimator(model_config=model_config,num_classes=train_config.num_classes).to(device)
+        model = make_estimator(model_config=model_config,num_classes=train_config.num_classes).to(device)
 
         train_and_valid(
             model=model,

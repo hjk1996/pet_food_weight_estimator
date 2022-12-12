@@ -117,7 +117,19 @@ def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
     return pred.nonzero(as_tuple=True)[0].tolist()
 
 
-def make_swin_v2_based_estimator(
+def make_estimator(
+    model_config: ModelConfig,
+    num_classes: int = 21,
+) -> nn.Module:
+        if "swin" in model_config.name:
+            return _make_swin_v2_based_estimator(model_config, num_classes)
+        elif "efficientnet" in model_config.name:
+            return _make_efficient_net_based_estimator(model_config, num_classes)
+        else:
+            raise NotImplementedError
+
+
+def _make_swin_v2_based_estimator(
     model_config: ModelConfig,
     num_classes: int = 21,
 ) -> nn.Module:
@@ -132,7 +144,7 @@ def make_swin_v2_based_estimator(
         num_classes=num_classes,
     )
 
-def make_efficient_net_based_estimator(
+def _make_efficient_net_based_estimator(
     model_config: ModelConfig,
     num_classes: int = 21,
 ) -> nn.Module:
