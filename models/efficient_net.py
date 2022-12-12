@@ -39,7 +39,6 @@ class EfficientNetBasedModel(nn.Module):
             nn.Linear(
                 in_features=self.feature_out_size, out_features=self.linear_hidden_size
             ),
-            nn.BatchNorm1d(num_features=self.linear_hidden_size),
             nn.SiLU(),
             nn.Dropout(p=0.2),
         )
@@ -50,7 +49,6 @@ class EfficientNetBasedModel(nn.Module):
                 in_features=self.linear_hidden_size,
                 out_features=self.linear_hidden_size,
             ),
-            nn.BatchNorm1d(num_features=self.linear_hidden_size),
             nn.SiLU(),
             nn.Dropout(p=0.2),
         )
