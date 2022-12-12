@@ -215,4 +215,6 @@ if __name__ == "__main__":
         dataloaders=dataloaders,
         n_epochs=train_config.epoch,
         save_path=train_config.save_path,
+        target_rmse=train_config.target_rmse,
+        targer_acc=train_config.target_acc,
     )
