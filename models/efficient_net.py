@@ -21,7 +21,8 @@ class EfficientNetBasedModel(nn.Module):
         self.estimator = nn.Sequential(
             self._make_adaptor_linear_block(),
             self._make_linear_block(),
-            self._make_last_linear_block(out_features=1)
+            self._make_last_linear_block(out_features=1),
+            nn.ReLU()
         )
 
         self.classifier = nn.Sequential(
@@ -31,9 +32,7 @@ class EfficientNetBasedModel(nn.Module):
         )
 
         self.ap = nn.AdaptiveAvgPool2d(1)
-
-
-        self.relu = nn.ReLU()
+        self.droupout = nn.Dropout(p=0.2)
 
     def _make_adaptor_linear_block(self) -> nn.modules.container.Sequential:
         return nn.Sequential(
@@ -41,7 +40,7 @@ class EfficientNetBasedModel(nn.Module):
                 in_features=self.feature_out_size, out_features=self.linear_hidden_size
             ),
             nn.BatchNorm1d(num_features=self.linear_hidden_size),
-            nn.ReLU(),
+            nn.SiLU(),
         )
 
     def _make_linear_block(self) -> nn.modules.container.Sequential:
@@ -51,7 +50,7 @@ class EfficientNetBasedModel(nn.Module):
                 out_features=self.linear_hidden_size,
             ),
             nn.BatchNorm1d(num_features=self.linear_hidden_size),
-            nn.ReLU(),
+            nn.SiLU(),
         )
 
     def _make_last_linear_block(
@@ -65,6 +64,7 @@ class EfficientNetBasedModel(nn.Module):
     def forward_feature(self, x: Tensor) -> Tensor:
         feature_map = self.backbone.forward_features(x)
         feature_map = self.ap(feature_map).squeeze(-1).squeeze(-1)
+        feature_map = self.droupout(feature_map)
         return feature_map
 
 
