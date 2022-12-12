@@ -154,7 +154,8 @@ def make_dataloaders(
     cropper_input_size: int = None,
     cropper_output_size: int = None,
     on_memory: bool = False,
-    transform=None,
+    train_transform=None,
+    val_transform=None,
     random_state: int = 1234,
     test_mode: bool = False
 ) -> dict:
@@ -174,9 +175,9 @@ def make_dataloaders(
         
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     train_dataset = DogFoodDataset(
-        train, img_dir, num_classes, device=device, transform=transform, cropper=cropper,  on_memory=on_memory
+        train, img_dir, num_classes, device=device, transform=train_transform, cropper=cropper,  on_memory=on_memory
     )
-    test_dataset = DogFoodDataset(test, img_dir, num_classes, device=device, cropper=cropper,  on_memory=on_memory)
+    test_dataset = DogFoodDataset(test, img_dir, num_classes, device=device, transform=val_transform, cropper=cropper,  on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
 

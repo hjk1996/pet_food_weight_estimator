@@ -33,7 +33,6 @@ class SwinV2BasedEstimator(nn.Module):
         )
 
 
-        self.droupout = nn.Dropout(p=0.2)
 
     def _make_adaptor_linear_block(self) -> nn.modules.container.Sequential:
         return nn.Sequential(

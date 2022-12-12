@@ -41,6 +41,7 @@ class EfficientNetBasedModel(nn.Module):
             ),
             nn.BatchNorm1d(num_features=self.linear_hidden_size),
             nn.SiLU(),
+            nn.Dropout(p=0.2),
         )
 
     def _make_linear_block(self) -> nn.modules.container.Sequential:
@@ -51,6 +52,7 @@ class EfficientNetBasedModel(nn.Module):
             ),
             nn.BatchNorm1d(num_features=self.linear_hidden_size),
             nn.SiLU(),
+            nn.Dropout(p=0.2),
         )
 
     def _make_last_linear_block(
@@ -64,7 +66,6 @@ class EfficientNetBasedModel(nn.Module):
     def forward_feature(self, x: Tensor) -> Tensor:
         feature_map = self.backbone.forward_features(x)
         feature_map = self.ap(feature_map).squeeze(-1).squeeze(-1)
-        feature_map = self.droupout(feature_map)
         return feature_map
 
 

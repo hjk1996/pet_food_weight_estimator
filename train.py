@@ -95,7 +95,7 @@ def train_and_valid(
     save_path: str,
 ) -> SummaryWriter:
     loss_fn = MultiTaskLossWrapper(classification=True)
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     best_mae = float("inf")
     best_weights = model.state_dict()
     save_path = os.path.join(
@@ -171,7 +171,7 @@ if __name__ == "__main__":
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
-            transform=T.AugMix(),
+            train_transform=T.AugMix(),
             cropper_weight_path=train_config.cropper_weight_path,
             cropper_input_size=train_config.cropper_input_size,
             cropper_output_size=train_config.cropper_output_size,
@@ -189,7 +189,7 @@ if __name__ == "__main__":
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
-            transform=T.AugMix(),
+            train_transform=T.AugMix(),
             test_mode=args.test_mode
         )
 
