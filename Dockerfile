@@ -1,4 +1,4 @@
-FROM pytorch/pytorch:1.13.0-cuda11.6-cudnn8-runtime
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
 RUN pip install timm==0.6.11 \
                 scikit-learn==1.0.2 \

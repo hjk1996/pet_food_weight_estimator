@@ -1,5 +1,6 @@
 import json
 from typing import Union
+import time
 
 import argparse
 import torch
@@ -32,7 +33,11 @@ def inference_on_one_image(
 
     weight, class_logit = model(img)
     weight = round(weight)
+
+    start = time.time()
     class_pred = get_class_prediction_from_logit(class_logit)
+    end = time.time()
+    print(f"예측에 걸린 시간: {(end - start) / 1000} (ms)\n")
 
     if mapping_path:
         with open(mapping_path, "r") as f:
