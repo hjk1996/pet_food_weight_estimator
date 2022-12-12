@@ -45,6 +45,8 @@ class TrainConfig:
     cropper_weight_path: str
     cropper_input_size: int
     cropper_output_size: int
+    target_rmse: float
+    target_acc: float
 
     @classmethod
     def from_json(cls, json_object: dict):
@@ -62,7 +64,9 @@ class TrainConfig:
             num_workers=json_object['num_workers'],
             cropper_weight_path=json_object['cropper_weight_path'],
             cropper_input_size=json_object['cropper_input_size'],
-            cropper_output_size=json_object['cropper_output_size']
+            cropper_output_size=json_object['cropper_output_size'],
+            target_rmse=json_object['target_rmse'],
+            target_acc=json_object['target_acc']
         )
 
 @dataclass

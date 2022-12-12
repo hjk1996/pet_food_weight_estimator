@@ -12,5 +12,7 @@
   "num_workers": 0,
   "cropper_weight_path": null,
   "cropper_input_size": null,
-  "cropper_output_size": null
+  "cropper_output_size": null,
+  "target_rmse": 0,
+  "target_acc": 1
 }

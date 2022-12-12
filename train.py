@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from typing import Any
+from typing import Any, Tuple
 import json
 import time
 
@@ -58,7 +58,7 @@ def validate_one_epoch(
     dataloader: DataLoader,
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
-) -> float:
+) -> Tuple[float, float]:
     running_loss = 0.0
     running_rmse = 0.0
     right_count = 0
@@ -86,7 +86,7 @@ def validate_one_epoch(
     writer.add_scalar("Valid/rmse", epoch_rmse, epoch)
     writer.add_scalar("Valid/acc", epoch_acc, epoch)
 
-    return epoch_rmse
+    return epoch_rmse, epoch_acc
 
 
 def train_and_valid(
@@ -94,10 +94,12 @@ def train_and_valid(
     dataloaders: dict,
     n_epochs: int,
     save_path: str,
+    target_rmse: float = .0,
+    targer_acc: float = 1.0,
 ) -> SummaryWriter:
     loss_fn = MultiTaskLossWrapper(classification=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
-    best_mae = float("inf")
+    best_rmse = float("inf")
     best_weights = model.state_dict()
     save_path = os.path.join(
         save_path, str(datetime.now()).replace(":", "-").replace(" ", "_").split(".")[0]
@@ -122,7 +124,7 @@ def train_and_valid(
                 )
             else:
                 model.eval()
-                epoch_mae = validate_one_epoch(
+                epoch_rmse, epoch_acc = validate_one_epoch(
                     epoch=i,
                     model=model,
                     dataloader=dataloader,
@@ -130,10 +132,16 @@ def train_and_valid(
                     loss_fn=loss_fn,
                 )
 
-                if epoch_mae < best_mae:
-                    best_mae = epoch_mae
+                if epoch_rmse < best_rmse:
+                    best_rmse = epoch_rmse
                     best_weights = model.state_dict()
                     save_model_weights(model.state_dict(), save_path, best=True)
+                
+                if epoch_rmse < target_rmse and epoch_acc > targer_acc:
+                    save_model_weights(model.state_dict(), save_path, best=False)
+                    print("Early Stopping at epoch", i, "\n")
+                    return writer
+
         end = time.time()
         print(f"EPOCH[{i}] took {end - start:.2f} seconds", "\n")
 
