@@ -126,7 +126,9 @@ def train_and_valid(
                     writer=writer,
                     loss_fn=loss_fn,
                     optimizer=optimizer,
+                    device=device             
                 )
+
             else:
                 model.eval()
                 epoch_rmse, epoch_acc = validate_one_epoch(
@@ -135,6 +137,8 @@ def train_and_valid(
                     dataloader=dataloader,
                     writer=writer,
                     loss_fn=loss_fn,
+                    device=device             
+
                 )
 
                 if epoch_rmse < best_rmse:
@@ -225,4 +229,5 @@ if __name__ == "__main__":
         save_path=train_config.save_path,
         target_rmse=train_config.target_rmse,
         targer_acc=train_config.target_acc,
+        device=device             
     )
