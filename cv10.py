@@ -2,16 +2,17 @@ import json
 import argparse
 
 import torch
+import torch.nn as nn
 import torchvision.transforms as T
 
 from utils import load_model_config, TrainConfig, make_estimator
 from dataset import make_dataloaders_for_cv10
 from train import train_and_valid
-
+from augmentation import kim_aug
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
-    parser.add_argument('--cpu', type=bool, default=False,)
+    parser.add_argument('--device', type=str, default="cuda",)
     parser.add_argument("--test_mode", action='store_true')
     args = parser.parse_args()
 
@@ -21,7 +22,8 @@ if __name__ == "__main__":
     if train_config.num_workers:
         torch.multiprocessing.set_start_method('spawn')
 
-    device = torch.device("cpu" if args.cpu else "cuda:0")
+
+    device = torch.device(args.device if torch.cuda.is_available() else "cpu")
 
     model_config = load_model_config(train_config.model_name)
 
@@ -35,7 +37,7 @@ if __name__ == "__main__":
             on_memory=train_config.on_memory,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
-            transform=T.AugMix(),
+            transform=kim_aug(),
             cropper_weight_path=train_config.cropper_weight_path,
             cropper_input_size=train_config.cropper_input_size,
             cropper_output_size=train_config.cropper_output_size,
@@ -50,17 +52,18 @@ if __name__ == "__main__":
             device=device,
             batch_size=train_config.batch_size,
             num_workers=train_config.num_workers,
-            transform=T.AugMix(),
+            transform=kim_aug(),
             test_mode=args.test_mode
         )
     
 
     for dataloaders in dataset_list:
-        model = make_estimator(model_config=model_config,num_classes=train_config.num_classes).to(device)
-
+        model = make_estimator(model_config=model_config,num_classes=train_config.num_classes)
+        model = nn.DataParallel(model).to(device)
         train_and_valid(
             model=model,
             dataloaders=dataloaders,
             n_epochs=train_config.epoch,
-            save_path=train_config.save_path
+            save_path=train_config.save_path,
+            device=device
         )
