@@ -2,12 +2,12 @@ import os
 from typing import Tuple, List
 from glob import glob
 
-
+from PIL import Image
 import pandas as pd
 import torch
 from torch import Tensor
 import torch.nn as nn
-from torchvision.transforms import Resize
+from torchvision.transforms import Resize, ToPILImage, ToTensor
 from torchvision.io import read_image
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
@@ -15,7 +15,18 @@ from sklearn.model_selection import StratifiedKFold
 
 from models.yolo_wrapper import YOLOWrapper
 
+
+
+# read image using pil
+def read_image_as_pil(img_path: str) -> Image:
+    return Image.open(img_path).convert("RGB")
+
+
+
 class YOLODataset(Dataset):
+    
+
+
     def __init__(
         self,
         img_dir: str,
@@ -101,9 +112,9 @@ class DogFoodDataset(Dataset):
         '''
 
         if self.on_memory:
-            gram = torch.tensor(self.gram_tensors[idx])
-            food_type = torch.tensor(self.food_type_tensors[idx])
-            img = torch.tensor(self.img_tensors[idx])
+            gram = self.gram_tensors[idx].clone().detach()
+            food_type = self.food_type_tensors[idx].clone().detach()
+            img = self.img_tensors[idx].clone().detach()
             
         else:
             gram = torch.tensor([self.meta_data.iloc[idx, 2]]).type(torch.FloatTensor)

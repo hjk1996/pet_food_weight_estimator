@@ -141,6 +141,9 @@ def _make_swin_v2_based_estimator(
     backbone = timm.create_model(model_config.name)
     backbone.head = None
 
+    # wrap the output with nn.DataParallel
+    # to support multi-gpu inference
+    
     return SwinV2BasedEstimator(
         backbone=backbone,
         feature_out_size=model_config.feature_out_size,

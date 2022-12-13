@@ -27,11 +27,13 @@ def train_one_epoch(
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
     optimizer: Any,
+    device: torch.device
 ):
     running_loss = 0.0
     dataloader_len = len(dataloader)
 
     for gram, food_type, img in dataloader:
+        gram, food_type, img = gram.to(device), food_type.to(device), img.to(device)
         optimizer.zero_grad()
         preds = model(img)
         loss = loss_fn(preds, (gram, food_type))
@@ -58,6 +60,7 @@ def validate_one_epoch(
     dataloader: DataLoader,
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
+    device: torch.device
 ) -> Tuple[float, float]:
     running_loss = 0.0
     running_rmse = 0.0
@@ -66,6 +69,7 @@ def validate_one_epoch(
     dataloader_len = len(dataloader)
 
     for gram, food_type, img in dataloader:
+        gram, food_type, img = gram.to(device), food_type.to(device), img.to(device)
         data_length += gram.shape[0]
         with torch.no_grad():
             preds = model(img)
@@ -94,6 +98,7 @@ def train_and_valid(
     dataloaders: dict,
     n_epochs: int,
     save_path: str,
+    device: torch.device,
     target_rmse: float = .0,
     targer_acc: float = 1.0,
 ) -> SummaryWriter:
@@ -155,7 +160,7 @@ def train_and_valid(
 if __name__ == "__main__": 
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
-    parser.add_argument('--cpu', type=bool, default=False,)
+    parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--test_mode', action="store_true")
     args = parser.parse_args()
 
@@ -166,7 +171,7 @@ if __name__ == "__main__":
         torch.multiprocessing.set_start_method('spawn')
 
 
-    device = torch.device("cpu" if args.cpu else "cuda:0")
+    device = torch.device(args.device if torch.cuda.is_available() and not args.cpu else "cpu")
 
     model_config = load_model_config(train_config.model_name)
 
@@ -205,7 +210,10 @@ if __name__ == "__main__":
     model = make_estimator(
         model_config=model_config,
         num_classes=train_config.num_classes,
-    ).to(device)
+    )
+
+    model = nn.DataParallel(model).to(device)
+
 
     if train_config.weight_path:
         model.load_state_dict(torch.load(train_config.weight_path))
