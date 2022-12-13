@@ -39,16 +39,17 @@ class YOLODataset(Dataset):
                 img_tensor: [3, width, height]
                 coords_tensor: [xyxy]
         '''
-        img_tensor = read_image(self.img_dir[i]).float() / 255
+        img_name = self.img_dir[i]
+        img_tensor = read_image(img_name).float() / 255
         coords_tensor = self.coords_map[os.path.basename(self.img_dir[i]).split('.')[0]]
-        return img_tensor, coords_tensor
+        return img_name, img_tensor, coords_tensor
 
     def get_coords(self):
         self.coords_map = {}
         labels_file_paths = glob(os.path.join(self.label_dir, "*.txt"))
         for path in labels_file_paths:
             with open(path, 'r') as f:
-                self.coords[os.path.basename(path).split('.')[0]] = torch.tensor(list(map(float, f.readline().split()[1:])))
+                self.coords_map[os.path.basename(path).split('.')[0]] = torch.tensor(list(map(float, f.readline().split()[1:])))
 
 class DogFoodDataset(Dataset):
     def __init__(

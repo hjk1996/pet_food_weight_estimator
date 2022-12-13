@@ -1,3 +1,4 @@
+from typing import Tuple, Optional
 import torch
 import torch.nn as nn
 import time
@@ -9,12 +10,12 @@ import torchvision.transforms.functional as T
 
 class YOLOWrapper(nn.Module):
 
-    def __init__(self, weight_path: str,  img_size: int, resize: int) -> None:
+    def __init__(self, weight_path: str,  img_size: int, resize: Optional[int] = None) -> None:
         super().__init__()
         self.model = attempt_load(weight_path)
         self.img_size = img_size
         self.resize =  resize
-        self.resizer = Resize((resize, resize))
+        self.resizer = Resize((img_size, img_size)) if resize is not None else None
         self.crop = T.crop
 
     
@@ -43,13 +44,16 @@ class YOLOWrapper(nn.Module):
                     w = x2 - x1
                     h = y2 - y1
                     cropped = self.crop(x[i], y1, x1, h, w)
-                    resized = self.resizer(cropped)
+                    if self.resize:
+                        resized = self.resizer(cropped)
+                    else:
+                        resized = cropped
                     images[i] = resized
                     has_bowl[i, 0] = True
         
         return images, has_bowl
     
-    def get_miou(self, image_tensor: torch.tensor, box_coords: torch.tensor) -> float:
+    def get_miou(self, image_tensor: torch.tensor, box_coords: torch.tensor) -> Tuple[list, float]:
         '''
         input:
 
@@ -74,17 +78,20 @@ class YOLOWrapper(nn.Module):
             # 즉, preds의 length는 배치 사이즈와 같음.
             preds = self.non_max_suppression(preds, max_det=1)
             ious = []
+            pred_coords = []
         
             for i, pred in enumerate(preds):
                 if pred.shape[0] == 0:
                     ious.append(0)
+                    pred_coords.append([0, 0, 0, 0])
                 else:
                     self.clip_coords(pred[:, :4], (self.img_size, self.img_size)) 
                     real_box_coords = self.xywh2xyxy(box_coords[i].unsqueeze(0)) * self.img_size
                     iou = self.box_iou(pred[:, :4], real_box_coords).squeeze().item()
                     ious.append(iou)
+                    pred_coords.append(pred[:, :4].squeeze().tolist())
         
-        return sum(ious) / image_tensor.shape[0]
+        return ious, sum(ious) / image_tensor.shape[0], pred_coords
             
   
 
