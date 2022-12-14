@@ -210,7 +210,7 @@ def make_dataloaders_for_cv10(
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     skf = StratifiedKFold(n_splits=10, )
 
-    for train_index, test_index in skf.split(meta_data, meta_data['gram']):
+    for train_index, test_index in skf.split(meta_data,  meta_data['gram'].map(str) + meta_data['food_type']):
         train = meta_data.iloc[train_index, :]
         test = meta_data.iloc[test_index, :]
         

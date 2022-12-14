@@ -9,7 +9,6 @@ import torch.nn.functional as F
 
 
 def kim_aug():
-    transforms.AugMix
     random_apply1 = transforms.RandomApply(nn.ModuleList([
                             transforms.ColorJitter(brightness=0.2)]), 
                             p=0.3)
