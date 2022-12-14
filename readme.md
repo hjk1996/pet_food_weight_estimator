@@ -36,15 +36,15 @@ train_config.json을 통해 훈련에 필요한 변수들을 설정합니다.
 | 칼럼 이름            | 내용                                                                                                                | 초기값                     |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------- |
 | epoch                | 훈련 반복 횟수                                                                                                      | 500                        |
-| batch_size           | 배치 사이즈                                                                                                         | 16                         |
+| batch_size           | 배치 사이즈                                                                                                         | 32                         |
 | test_size            | 테스트 데이터 비중                                                                                                  | 0.2                        |
-| model_name           | 사용할 backbone 모델 이름 (현재 swinv2_tiny_window8_256만 지원)                                                     | swinv2_tiny_window8_256    |
+| model_name           | 사용할 backbone 모델 이름 (현재 swinv2 및 efficiientnet_v2 지원)                                                     | efficientnetv2_s   |
 | num_classes          | 사료 종류수                                                                                                         | 21                         |
 | on_memory            | 데이터셋을 모두 메모리에 올리고 학습할 지 여부. true로 설정시 학습 속도가 증가할 수 있으나 메모리가 부족할 수 있음. | false                      |
 | image_folder_path    | 이미지가 저장된 폴더 경로                                                                                           | ./data/images              |
 | image_meta_data_path | 이미지 메타 데이터 경로                                                                                             | ./data/image_meta_data.csv |
 | weight_path          | 학습된 모델 가중치 경로. 설정시 해당 가중치를 이용해 학습을 진행함.                                                 | null                       |
-| num_workers          | data loading시 사용하는 subprocess의 수. 0은 메인 프로세스 하나만 의미함.                                           | 0                          |
+| num_workers          | data loading시 사용하는 subprocess의 수. 0은 메인 프로세스 하나만 의미함.                                           | 8                          |
 | cropper_weight_path  | object detection을 위해서 사용하는 yolov7의 가중치 경로                                                             | null                       |
 | cropper_input_size   | yolov7의 입력으로 들어가는 이미지 크기                                                                              | null                       |
 | cropper_output_size  | yolov7의 출력(crop된 이미지) 이미지의 크기                                                                          | null                       |
