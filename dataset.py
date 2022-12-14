@@ -68,7 +68,6 @@ class DogFoodDataset(Dataset):
         meta_data: pd.DataFrame,
         img_dir: str,
         n_classes: int,
-        device: torch.device,
         on_memory: bool = False,
         cropper: nn.Module = None,
         transform=None,
@@ -77,7 +76,6 @@ class DogFoodDataset(Dataset):
         self.img_dir = img_dir
         self.transform = transform
         self.n_classes = n_classes
-        self.device = device
         self.on_memory = on_memory
         self.cropper = cropper
         
@@ -139,7 +137,7 @@ class DogFoodDataset(Dataset):
 
         img = img.float() / 255
 
-        return gram.to(self.device), food_type.to(self.device), img.to(self.device)
+        return gram, food_type, img
 
 
 
@@ -160,7 +158,6 @@ def make_dataloaders(
     num_classes: int,
     test_size: float,
     batch_size: int,
-    device: torch.device,
     num_workers: int = 0,
     cropper_weight_path: str = None,
     cropper_input_size: int = None,
@@ -187,9 +184,9 @@ def make_dataloaders(
         
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     train_dataset = DogFoodDataset(
-        train, img_dir, num_classes, device=device, transform=train_transform, cropper=cropper,  on_memory=on_memory
+        train, img_dir, num_classes, transform=train_transform, cropper=cropper,  on_memory=on_memory
     )
-    test_dataset = DogFoodDataset(test, img_dir, num_classes, device=device, transform=val_transform, cropper=cropper,  on_memory=on_memory)
+    test_dataset = DogFoodDataset(test, img_dir, num_classes, transform=val_transform, cropper=cropper,  on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
     test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
 
@@ -200,7 +197,6 @@ def make_dataloaders_for_cv10(
     img_dir: str,
     num_classes: int,
     batch_size: int,
-    device: torch.device,
     num_workers: int = 0,
     cropper_weight_path: str = None,
     cropper_input_size: int = None,
@@ -211,7 +207,6 @@ def make_dataloaders_for_cv10(
 ) -> List[dict]:
     dataset_list = []
     meta_data = pd.read_csv(image_meta_data_path)
-    hash = make_hash(meta_data)
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     skf = StratifiedKFold(n_splits=10, )
 
@@ -224,9 +219,9 @@ def make_dataloaders_for_cv10(
             test = test[:64]
 
         train_dataset = DogFoodDataset(
-            train, img_dir, num_classes, device=device, transform=transform, cropper=cropper,  on_memory=on_memory
+            train, img_dir, num_classes,  transform=transform, cropper=cropper,  on_memory=on_memory
         )
-        test_dataset = DogFoodDataset(test, img_dir, num_classes, device=device, cropper=cropper,  on_memory=on_memory)
+        test_dataset = DogFoodDataset(test, img_dir, num_classes,  cropper=cropper,  on_memory=on_memory)
         train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
         test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
         dataset_list.append({"train": train_dataloader, "test": test_dataloader})

@@ -168,7 +168,7 @@ if __name__ == "__main__":
     parser.add_argument('--test_mode', action="store_true")
     args = parser.parse_args()
 
-    with open(args.train_config_path, "r") as f:
+    with open(args.config_path, "r") as f:
         train_config = TrainConfig.from_json(json.load(f))
 
     if train_config.num_workers:
@@ -184,7 +184,6 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            device=device,
             on_memory=train_config.on_memory,
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
@@ -202,7 +201,6 @@ if __name__ == "__main__":
             image_meta_data_path=train_config.image_meta_data_path,
             img_dir=train_config.image_folder_path,
             num_classes=train_config.num_classes,
-            device=device,
             on_memory=train_config.on_memory,
             test_size=train_config.test_size,
             batch_size=train_config.batch_size,
