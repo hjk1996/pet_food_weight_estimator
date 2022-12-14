@@ -163,7 +163,7 @@ def train_and_valid(
 
 if __name__ == "__main__": 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
+    parser.add_argument("--config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
     parser.add_argument('--device', type=str, default='cuda')
     parser.add_argument('--test_mode', action="store_true")
     args = parser.parse_args()

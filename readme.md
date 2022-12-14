@@ -7,7 +7,7 @@ docker를 통해 구동환경을 설정할 것을 권장합니다.
 1. docker 이미지를 다운로드 합니다.
 
 ```
-docker pull hjk1996/iitp:0.3
+docker pull hjk1996/iitp:0.4
 ```
 
 2. repository를 클론합니다.
@@ -20,16 +20,16 @@ git clone --recursive https://github.com/hjk1996/pet_food_weight_estimator.git
 
 ```
 # gpu 사용하지 않는 경우
-docker run -it -p 6006:6006 -v <repository>:/workspace/ hjk1996/iitp:0.3 /bin/bash
+docker run -it -p 6006:6006 -v <repository>:/workspace/ hjk1996/iitp:0.4 /bin/bash
 # gpu 사용하는 경우
-docker run --gpus '"device=0"' -it -p 6006:6006 -v <repository>:/workspace/ hjk1996/iitp:0.3 /bin/bash
+docker run --gpus '"device=0"' -it -p 6006:6006 -v <repository>:/workspace/ hjk1996/iitp:0.4 /bin/bash
 ```
 
 ## 학습
 
 ---
 
-### 1. 데이터 세팅
+### 1. 설정
 
 train_config.json을 통해 훈련에 필요한 변수들을 설정합니다.
 
@@ -72,11 +72,19 @@ root
 ### 2. 학습 시작
 
 명령어를 입력해 모델 학습을 실시합니다.  
-train과 관련된 설정이 저장된 json 파일의 경로를 전달합니다.
+train과 관련된 설정이 저장된 json 파일의 경로를 파라미터로 전달합니다.
+훈련 과정에서 설정할 수 있는 command line 파라미터는 다음과 같습니다.
+
+|파라미터|설명|기본값|
+|--config_path|훈련 설정 json 파일의 경로 |./train_config.json|
+|--device|훈련에 사용할 장치. 장착된 gpu를 모두 사용하는 경우 'cuda', 특정 gpu를 사용하는 경우 'cuda:0' 또는 'cuda:0,1' 등, cpu를 사용할 경우 'cpu' |cuda|
+|--test_mode|해당 파라미터를 전달할 경우 테스트 모드로 학습을 실행함. 모델과 훈련 과정이 정상적으로 진행되는 것을 빠르게 확인하고 싶을 떄 사용.||
+
+아래는 예시 학습 코드입니다.
 
 ```
 # example
-python train.py --train_config_path <train_config file path>
+python train.py --config_path <train_config file path> --device cuda:0
 ```
 
 학습 결과는 train_confing.json에서 설정한 save_path로 지정한 경로에 저장됩니다.
@@ -114,6 +122,7 @@ tensorboard --logdir=results/2022-11-03_10-37-07/log
 ---
 
 학습된 가중치를 이용해서 사료 이미지의 중량과 종류에 대해 추론할 수 있습니다.
+추론과 관련한 설정은 inference_config.json에서 수정할 수 있습니다.
 
 ```
 #example
@@ -122,8 +131,6 @@ python inference.py --image_path ./data/images/image1.jpg --weights ./model_weig
 
 | 파라미터     | 설명                                                                                                                           | 기본값 |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------ |
-| image_path   | 이미지 파일 경로                                                                                                               |        |
-| weights      | 모델 가중치 경로                                                                                                               |        |
+| img_path   | 이미지 파일 경로                                                                                                               |        |
+| config_path      | 추론 설정 파일 경로                                                                                                              |   ./config_path.json     |
 | resize       | 해당 파라미터의 값을 입력하면 입력한 사이즈로 이미지가 리사이즈된 후 모델의 입력으로 전달됨                                    | None   |
-| n_classes    | 모델이 사료 종류 분류가 가능할 경우 모델이 분류할 수 있는 사료의 종류의 수                                                     | 21     |
-| mapping_path | 모델의 사료 종류 예측에 대한 output과 실제 사료의 이름을 매핑해주는 json 파일의 경로. 없으면 사료 종류에 대한 indice만 반환함. | None   |

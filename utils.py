@@ -115,10 +115,17 @@ def load_image_as_tensor(path: str, resize: int = None, batch_dim: bool = True) 
 
 
 
-def get_class_prediction_from_logit(class_logit: Tensor) -> List[int]:
+
+def get_class_prediction_from_logit(class_logit: Tensor) -> List[List[int]]:
+    '''
+    input shape: (batch_size, num_classes)
+    output: 2d list of class indices
+    '''
     pred = torch.sigmoid(class_logit)
     pred = torch.where(pred >= 0.5, 1.0, 0.0)
-    return pred.nonzero(as_tuple=True)[0].tolist()
+    # 각 배치마다 값이 1인 곳의 인덱스를 가져온다
+    return [torch.where(pred[i] == 1.0)[0].tolist() for i in range(pred.shape[0])]
+
 
 
 def make_estimator(
@@ -144,11 +151,13 @@ def _make_swin_v2_based_estimator(
     # wrap the output with nn.DataParallel
     # to support multi-gpu inference
     
-    return SwinV2BasedEstimator(
+    return nn.DataParallel(
+        SwinV2BasedEstimator(
         backbone=backbone,
         feature_out_size=model_config.feature_out_size,
         linear_hidden_size=model_config.feature_out_size,
         num_classes=num_classes,
+        )
     )
 
 def _make_efficient_net_based_estimator(
@@ -159,11 +168,13 @@ def _make_efficient_net_based_estimator(
     backbone = timm.create_model(model_config.name)
     backbone.head = None
 
-    return EfficientNetBasedModel(
+    return nn.DataParallel(
+        EfficientNetBasedModel(
         backbone=backbone,
         feature_out_size=model_config.feature_out_size,
         linear_hidden_size=model_config.feature_out_size,
         num_classes=num_classes,
+        )
     )
     
 
