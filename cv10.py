@@ -9,9 +9,11 @@ from utils import load_model_config, TrainConfig, make_estimator
 from dataset import make_dataloaders_for_cv10
 from train import train_and_valid
 from augmentation import kim_aug
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train_config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
+    parser.add_argument("--config_path", type=str, required=True,  help="훈련에 사용할 설정이 정의되어 있는 json file의 경로")
     parser.add_argument('--device', type=str, default="cuda",)
     parser.add_argument("--test_mode", action='store_true')
     args = parser.parse_args()
@@ -58,8 +60,7 @@ if __name__ == "__main__":
     
 
     for dataloaders in dataset_list:
-        model = make_estimator(model_config=model_config,num_classes=train_config.num_classes)
-        model = nn.DataParallel(model).to(device)
+        model = make_estimator(model_config=model_config,num_classes=train_config.num_classes).to(device)
         train_and_valid(
             model=model,
             dataloaders=dataloaders,

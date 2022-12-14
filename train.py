@@ -214,9 +214,9 @@ if __name__ == "__main__":
     model = make_estimator(
         model_config=model_config,
         num_classes=train_config.num_classes,
-    )
+    ).to(device)
 
-    model = nn.DataParallel(model).to(device)
+ 
 
 
     if train_config.weight_path:
