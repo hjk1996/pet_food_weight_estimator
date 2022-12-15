@@ -38,5 +38,10 @@
     "name": "efficientnetv2_s",
     "resolution": 224,
     "feature_out_size": 1280
+  },
+  "efficientnetv2_l": {
+    "name": "efficientnetv2_l",
+    "resolution": 456,
+    "feature_out_size": 1280
   }
 }

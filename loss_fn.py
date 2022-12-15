@@ -23,7 +23,7 @@ class MultiTaskLossWrapper(nn.Module):
 
     def multi_task_forward(self, preds, gts):
         weight_loss = self.weight_loss_fn(preds[0], gts[0])
-        class_loss = self.class_loss_fn(preds[1], gts[1]) * 8
+        class_loss = self.class_loss_fn(preds[1], gts[1]) * 64
         return (weight_loss + class_loss).type(FloatTensor)
 
     def single_task_forward(self, preds, gts):

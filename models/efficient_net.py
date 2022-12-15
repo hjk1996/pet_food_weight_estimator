@@ -61,7 +61,7 @@ class EfficientNetBasedModel(nn.Module):
         )
     
         
-    def forward_feature(self, x: Tensor) -> Tensor:
+    def forward_features(self, x: Tensor) -> Tensor:
         feature_map = self.backbone.forward_features(x)
         feature_map = self.ap(feature_map).squeeze(-1).squeeze(-1)
         return feature_map
@@ -73,7 +73,7 @@ class EfficientNetBasedModel(nn.Module):
                 weight [batch_size, 1]
                 class_logit [batch_size,  n_classes]
         '''
-        feature_map = self.forward_feature(x)
+        feature_map = self.forward_features(x)
         weight = self.estimator(feature_map)
         class_logit = self.classifier(feature_map)
         return weight, class_logit
