@@ -188,7 +188,7 @@ def make_dataloaders(
     )
     test_dataset = DogFoodDataset(test, img_dir, num_classes, transform=val_transform, cropper=cropper,  on_memory=on_memory)
     train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
 
     return {"train": train_dataloader, "test": test_dataloader}
 
@@ -223,7 +223,7 @@ def make_dataloaders_for_cv10(
         )
         test_dataset = DogFoodDataset(test, img_dir, num_classes,  cropper=cropper,  on_memory=on_memory)
         train_dataloader = DataLoader(train_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
-        test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True)
+        test_dataloader = DataLoader(test_dataset, num_workers=num_workers, batch_size=1, shuffle=True)
         dataset_list.append({"train": train_dataloader, "test": test_dataloader})
     
     return dataset_list

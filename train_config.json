@@ -1,6 +1,6 @@
 {
   "epoch": 500,
-  "batch_size": 32,
+  "batch_size": 64,
   "test_size": 0.2,
   "model_name": "efficientnetv2_s",
   "num_classes": 10,

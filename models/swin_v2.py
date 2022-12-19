@@ -32,6 +32,9 @@ class SwinV2BasedEstimator(nn.Module):
             self._make_last_linear_block(out_features=num_classes)
         )
 
+        self.droupout = nn.Dropout(p=0.2)
+
+
 
 
     def _make_adaptor_linear_block(self) -> nn.modules.container.Sequential:
@@ -39,8 +42,8 @@ class SwinV2BasedEstimator(nn.Module):
             nn.Linear(
                 in_features=self.feature_out_size, out_features=self.linear_hidden_size
             ),
+            nn.BatchNorm1d(self.linear_hidden_size),
             nn.SiLU(),
-            nn.Dropout(p=0.2),
         )
 
     def _make_linear_block(self) -> nn.modules.container.Sequential:
@@ -49,8 +52,8 @@ class SwinV2BasedEstimator(nn.Module):
                 in_features=self.linear_hidden_size,
                 out_features=self.linear_hidden_size,
             ),
+            nn.BatchNorm1d(self.linear_hidden_size),
             nn.SiLU(),
-            nn.Dropout(p=0.2),
         )
 
     def _make_last_linear_block(
@@ -64,6 +67,7 @@ class SwinV2BasedEstimator(nn.Module):
     def forward_feature(self, x: Tensor) -> Tensor:
         feature_map = self.backbone.forward_features(x)
         feature_map = feature_map.mean(1)
+        feature_map = self.droupout(feature_map)
         return feature_map
 
 

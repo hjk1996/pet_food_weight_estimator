@@ -74,8 +74,8 @@ def validate_one_epoch(
         with torch.no_grad():
             preds = model(img)
             loss = loss_fn(preds, (gram, food_type))
-            running_loss += loss.item()
-            running_rmse += loss_fn.weight_loss_fn(preds[0], gram)
+            running_loss += loss_fn.last_loss
+            running_rmse += loss_fn.last_rmse
             right_count += evaluate_classification(food_type, preds[1])
 
     epoch_loss = running_loss / dataloader_len
