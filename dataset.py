@@ -2,6 +2,7 @@ import os
 from typing import Tuple, List
 from glob import glob
 
+import numpy as np
 from PIL import Image
 import pandas as pd
 import torch
@@ -169,6 +170,7 @@ def make_dataloaders(
     test_mode: bool = False
 ) -> dict:
     meta_data = pd.read_csv(image_meta_data_path)
+    meta_data = meta_data.replace(np.nan, "")
     hash = make_hash(meta_data)
 
     train, test = train_test_split(
@@ -207,6 +209,7 @@ def make_dataloaders_for_cv10(
 ) -> List[dict]:
     dataset_list = []
     meta_data = pd.read_csv(image_meta_data_path)
+    meta_data = meta_data.replace(np.nan, "")
     cropper = YOLOWrapper(weight_path=cropper_weight_path, img_size=cropper_input_size, resize=cropper_output_size) if cropper_weight_path else None
     skf = StratifiedKFold(n_splits=10, )
 
