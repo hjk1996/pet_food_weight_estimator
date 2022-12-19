@@ -5,7 +5,7 @@
   "model_name": "efficientnetv2_s",
   "num_classes": 10,
   "on_memory": false,
-  "image_folder_path": "./data/iitp/256x256",
+  "image_folder_path": "./data/224x224_images",
   "image_meta_data_path": "./data/iitp_image_meta_data.csv",
   "weight_path": null,
   "save_path": "./results",
