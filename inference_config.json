@@ -1,6 +1,6 @@
 {
-  "weight_path": "./model_weights/best.pt",
-  "model_name": "swinv2_tiny_window8_256",
-  "num_classes": 21,
+  "weight_path": "./results/2022-12-20_07-15-17/best.pt",
+  "model_name": "efficientnetv2_s",
+  "num_classes": 10,
   "mapping_path": "./data/indice_name_mapping.json"
 }

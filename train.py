@@ -10,11 +10,11 @@ from torch import Tensor
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-import torchvision.transforms as T
 
 from loss_fn import MultiTaskLossWrapper
+from models.model_loader import make_model
 from dataset import make_dataloaders
-from utils import save_model_weights, load_model_config, make_estimator,TrainConfig
+from utils import save_model_weights, TrainConfig
 from augmentation import kim_aug
 
 
@@ -177,7 +177,7 @@ if __name__ == "__main__":
 
     device = torch.device(args.device if torch.cuda.is_available() and not args.cpu else "cpu")
 
-    model_config = load_model_config(train_config.model_name)
+    # model_config = load_model_config(train_config.model_name)
 
     if train_config.cropper_weight_path and train_config.cropper_input_size and train_config.cropper_output_size:
         dataloaders = make_dataloaders(
@@ -209,14 +209,9 @@ if __name__ == "__main__":
             test_mode=args.test_mode
         )
 
-    model = make_estimator(
-        model_config=model_config,
-        num_classes=train_config.num_classes,
-    ).to(device)
+    model = make_model(model_name=train_config.model_name, num_classes=train_config.num_classes, hidden_size=512).to(device)
 
  
-
-
     if train_config.weight_path:
         model.load_state_dict(torch.load(train_config.weight_path))
 

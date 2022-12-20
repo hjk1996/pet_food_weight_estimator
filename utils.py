@@ -11,23 +11,7 @@ from torchvision.io import read_image
 from torchvision.transforms import Resize
 import timm
 
-from models.swin_v2 import SwinV2BasedEstimator
-from models.efficient_net import EfficientNetBasedModel
 
-
-@dataclass
-class ModelConfig:
-    name: str
-    resolution: int
-    feature_out_size: int
-
-    @classmethod
-    def from_json(cls, json_object: dict):
-        return cls(
-            name=json_object["name"],
-            resolution=json_object["resolution"],
-            feature_out_size=json_object["feature_out_size"],
-        )
 
 @dataclass
 class TrainConfig:
@@ -85,9 +69,7 @@ class InferenceConfig:
             mapping_path=json_object['mapping_path']
         ) 
 
-def load_model_config(model_name: str) -> ModelConfig:
-    with open('model_configs.json', 'r') as f:
-        return ModelConfig.from_json(json.load(f)[model_name])
+
 
 def save_model_weights(weights: dict, save_path: str, best: bool = False) -> None:
     new_save_path = os.path.join(save_path, "best.pt" if best else "last.pt")
@@ -127,54 +109,4 @@ def get_class_prediction_from_logit(class_logit: Tensor) -> List[List[int]]:
     return [torch.where(pred[i] == 1.0)[0].tolist() for i in range(pred.shape[0])]
 
 
-
-def make_estimator(
-    model_config: ModelConfig,
-    num_classes: int = 21,
-) -> nn.Module:
-        if "swin" in model_config.name:
-            return _make_swin_v2_based_estimator(model_config, num_classes)
-        elif "efficientnet" in model_config.name:
-            return _make_efficient_net_based_estimator(model_config, num_classes)
-        else:
-            raise NotImplementedError
-
-
-def _make_swin_v2_based_estimator(
-    model_config: ModelConfig,
-    num_classes: int = 21,
-) -> nn.Module:
-
-    backbone = timm.create_model(model_config.name)
-    backbone.head = None
-
-    # wrap the output with nn.DataParallel
-    # to support multi-gpu inference
-    
-    return nn.DataParallel(
-        SwinV2BasedEstimator(
-        backbone=backbone,
-        feature_out_size=model_config.feature_out_size,
-        linear_hidden_size=model_config.feature_out_size,
-        num_classes=num_classes,
-        )
-    )
-
-def _make_efficient_net_based_estimator(
-    model_config: ModelConfig,
-    num_classes: int = 21,
-) -> nn.Module:
-
-    backbone = timm.create_model(model_config.name)
-    backbone.head = None
-
-    return nn.DataParallel(
-        EfficientNetBasedModel(
-        backbone=backbone,
-        feature_out_size=model_config.feature_out_size,
-        linear_hidden_size=model_config.feature_out_size,
-        num_classes=num_classes,
-        )
-    )
-    
 

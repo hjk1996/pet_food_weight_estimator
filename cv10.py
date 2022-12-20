@@ -3,12 +3,12 @@ import argparse
 
 import torch
 import torch.nn as nn
-import torchvision.transforms as T
 
-from utils import load_model_config, TrainConfig, make_estimator
+from utils import  TrainConfig
 from dataset import make_dataloaders_for_cv10
 from train import train_and_valid
 from augmentation import kim_aug
+from models.model_loader import make_model
 
 
 if __name__ == "__main__":
@@ -27,7 +27,6 @@ if __name__ == "__main__":
 
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
 
-    model_config = load_model_config(train_config.model_name)
 
     if train_config.cropper_weight_path and train_config.cropper_input_size and train_config.cropper_output_size:
         
@@ -58,7 +57,7 @@ if __name__ == "__main__":
     
 
     for dataloaders in dataset_list:
-        model = make_estimator(model_config=model_config,num_classes=train_config.num_classes).to(device)
+        model = make_model(model_name=train_config.model_name, num_classes=train_config.num_classes).to(device)
         train_and_valid(
             model=model,
             dataloaders=dataloaders,
