@@ -5,7 +5,7 @@ import torch.nn as nn
 __all__ = ['adaptor_mapper']
 
 class EfficientNetAdaptor(nn.Module):
-    def __init__(self, feature_out_size: int, hidden_size: int = 512):
+    def __init__(self, feature_out_size: int, hidden_size: int = 1280):
         super().__init__()
         self.hidden_size = hidden_size
         self.ap = nn.AdaptiveAvgPool2d(1)
@@ -17,7 +17,7 @@ class EfficientNetAdaptor(nn.Module):
         return self.linear(x)
 
 class SwinV2Adaptor(nn.Module):
-    def __init__(self, feature_out_size: int, hidden_size: int = 512):
+    def __init__(self, feature_out_size: int, hidden_size: int = 1280):
         super().__init__()
         self.hidden_size = hidden_size
         self.linear = nn.Linear(in_features=feature_out_size, out_features=hidden_size)

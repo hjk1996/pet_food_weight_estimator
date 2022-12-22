@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 import json
 import time
-
 import argparse
+
+import pandas as pd
 import torch
 from torch import Tensor
 import torch.nn as nn
@@ -62,11 +63,13 @@ def validate_one_epoch(
     loss_fn: MultiTaskLossWrapper,
     device: torch.device
 ) -> Tuple[float, float]:
+
     running_loss = 0.0
     running_rmse = 0.0
     right_count = 0
     data_length = 0
     dataloader_len = len(dataloader)
+
 
     for gram, food_type, img in dataloader:
         gram, food_type, img = gram.to(device), food_type.to(device), img.to(device)
@@ -97,19 +100,23 @@ def train_and_valid(
     model: nn.Module,
     dataloaders: dict,
     n_epochs: int,
-    save_path: str,
     device: torch.device,
+    save_path: str,
     target_rmse: float = .0,
     targer_acc: float = 1.0,
-) -> SummaryWriter:
+) -> pd.DataFrame:
     loss_fn = MultiTaskLossWrapper(classification=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
     best_rmse = float("inf")
     best_weights = model.state_dict()
+
     save_path = os.path.join(
         save_path, str(datetime.now()).replace(":", "-").replace(" ", "_").split(".")[0]
     )
-    writer = SummaryWriter(os.path.join(save_path, "log"))
+    writer = SummaryWriter(os.path.join(save_path, "tensorboard_log"))
+
+    rmse_logs = []
+    acc_logs = []
 
     for i in range(n_epochs):
         start = time.time()
@@ -140,6 +147,8 @@ def train_and_valid(
                     device=device             
 
                 )
+                rmse_logs.append(epoch_rmse)
+                acc_logs.append(epoch_acc)
 
                 if epoch_rmse < best_rmse:
                     best_rmse = epoch_rmse
@@ -155,9 +164,10 @@ def train_and_valid(
         print(f"EPOCH[{i}] took {end - start:.2f} seconds", "\n")
 
     writer.close()
+    df = pd.DataFrame({"epoch": list(range(len(rmse_logs))), "rmse": rmse_logs, "acc": acc_logs})
     save_model_weights(best_weights, save_path, best=False)
 
-    return writer
+    return df
 
 
 
@@ -209,7 +219,7 @@ if __name__ == "__main__":
             test_mode=args.test_mode
         )
 
-    model = make_model(model_name=train_config.model_name, num_classes=train_config.num_classes, hidden_size=512).to(device)
+    model = make_model(model_name=train_config.model_name, num_classes=train_config.num_classes, hidden_size=1280).to(device)
 
  
     if train_config.weight_path:
