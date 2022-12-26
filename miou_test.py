@@ -10,35 +10,32 @@ from dataset import YOLODataset
 
 # make timestamp format as string date that can be used as file name
 def timestamp_to_file_name(timestamp) -> str:
-    return datetime.fromtimestamp(timestamp).strftime('%Y%m%d_%H%M%S')
+    return datetime.fromtimestamp(timestamp).strftime("%Y%m%d_%H%M%S")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weight_path', type=str, default='./yolov7/weights/best.pt')
-    parser.add_argument('--img_path', type=str, default='./yolov7/dataset/sm/test/images')
-    parser.add_argument('--label_path', type=str, default='./yolov7/dataset/sm/test/labels')
-    parser.add_argument('--save_path', type=str, default='./results/yolov7')
+    parser.add_argument("--weight_path", type=str, default="./yolov7/weights/best.pt")
+    parser.add_argument(
+        "--img_path", type=str, default="./yolov7/dataset/sm/test/images"
+    )
+    parser.add_argument(
+        "--label_path", type=str, default="./yolov7/dataset/sm/test/labels"
+    )
+    parser.add_argument("--save_path", type=str, default="./results/yolov7")
     args = parser.parse_args()
 
     os.makedirs(args.save_path, exist_ok=True)
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    
-    yolo = YOLOWrapper(
-        weight_path=args.weight_path,
-        img_size=416,
-    ).to(device)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    yolo = YOLOWrapper(weight_path=args.weight_path, img_size=416,).to(device)
 
     dataset = YOLODataset(
-        img_dir=args.img_path,
-        label_dir=args.label_path,
-        device=device,
+        img_dir=args.img_path, label_dir=args.label_path, device=device,
     )
 
-    dataloader = DataLoader(
-        dataset=dataset,
-        batch_size=16,
-    )
+    dataloader = DataLoader(dataset=dataset, batch_size=16,)
     names = []
     ious = []
     real_x1 = []
@@ -62,22 +59,25 @@ if __name__ == '__main__':
         pred_x2 += list(map(lambda x: x[2], batch_coords))
         pred_y2 += list(map(lambda x: x[3], batch_coords))
         print(f"current miou: {sum(ious) / len(ious)}")
-    
-    log = pd.DataFrame({
-        'name': names,
-        'iou': ious,
-        'real_x1': real_x1,
-        'real_y1': real_y1,
-        'real_x2': real_x2,
-        'real_y2': real_y2,
-        'pred_x1': pred_x1,
-        'pred_y1': pred_y1,
-        'pred_x2': pred_x2,
-        'pred_y2': pred_y2,
-    })
+
+    log = pd.DataFrame(
+        {
+            "name": names,
+            "iou": ious,
+            "real_x1": real_x1,
+            "real_y1": real_y1,
+            "real_x2": real_x2,
+            "real_y2": real_y2,
+            "pred_x1": pred_x1,
+            "pred_y1": pred_y1,
+            "pred_x2": pred_x2,
+            "pred_y2": pred_y2,
+        }
+    )
 
     print(f"miou: {log['iou'].mean()}")
-    save_path = os.path.join(args.save_path,
-                                f"{timestamp_to_file_name(datetime.now().timestamp())}.csv")
+    save_path = os.path.join(
+        args.save_path, f"{timestamp_to_file_name(datetime.now().timestamp())}.csv"
+    )
     log.to_csv(save_path, index=False)
     print(f"saved at {save_path}")

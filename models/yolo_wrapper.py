@@ -8,32 +8,33 @@ from torchvision.transforms.transforms import Resize
 import torchvision
 import torchvision.transforms.functional as T
 
-class YOLOWrapper(nn.Module):
 
-    def __init__(self, weight_path: str,  img_size: int, resize: Optional[int] = None) -> None:
+class YOLOWrapper(nn.Module):
+    def __init__(
+        self, weight_path: str, img_size: int, resize: Optional[int] = None
+    ) -> None:
         super().__init__()
         self.model = attempt_load(weight_path)
         self.img_size = img_size
-        self.resize =  resize
+        self.resize = resize
         self.resizer = Resize((img_size, img_size)) if resize is not None else None
         self.crop = T.crop
 
-    
     def forward(self, x):
-        '''
+        """
         return: 
             images [batch, 3, w, h]
 
             has_bowl [batch, 1]
 
-        '''
+        """
 
         with torch.no_grad():
             preds, _ = self.model(x)
             preds = self.non_max_suppression(preds, max_det=1)
             images = torch.zeros((len(preds), 3, self.resize, self.resize))
             has_bowl = torch.zeros((len(preds), 1))
-        
+
             for i, pred in enumerate(preds):
                 if pred.shape[0] == 0:
                     images[i] = self.resizer(x[i])
@@ -50,11 +51,13 @@ class YOLOWrapper(nn.Module):
                         resized = cropped
                     images[i] = resized
                     has_bowl[i, 0] = True
-        
+
         return images, has_bowl
-    
-    def get_miou(self, image_tensor: torch.tensor, box_coords: torch.tensor) -> Tuple[list, float]:
-        '''
+
+    def get_miou(
+        self, image_tensor: torch.tensor, box_coords: torch.tensor
+    ) -> Tuple[list, float]:
+        """
         input:
 
             image_tensor: [batch_size, 3, width, hegiht]
@@ -69,8 +72,8 @@ class YOLOWrapper(nn.Module):
         output:
 
             mIoU: float [0,1]
-        '''
-        assert(image_tensor.shape[0] == box_coords.shape[0])
+        """
+        assert image_tensor.shape[0] == box_coords.shape[0]
 
         with torch.no_grad():
             preds, _ = self.model(image_tensor)
@@ -79,25 +82,34 @@ class YOLOWrapper(nn.Module):
             preds = self.non_max_suppression(preds, max_det=1)
             ious = []
             pred_coords = []
-        
+
             for i, pred in enumerate(preds):
                 if pred.shape[0] == 0:
                     ious.append(0)
                     pred_coords.append([0, 0, 0, 0])
                 else:
-                    self.clip_coords(pred[:, :4], (self.img_size, self.img_size)) 
-                    real_box_coords = self.xywh2xyxy(box_coords[i].unsqueeze(0)) * self.img_size
+                    self.clip_coords(pred[:, :4], (self.img_size, self.img_size))
+                    real_box_coords = (
+                        self.xywh2xyxy(box_coords[i].unsqueeze(0)) * self.img_size
+                    )
                     iou = self.box_iou(pred[:, :4], real_box_coords).squeeze().item()
                     ious.append(iou)
                     pred_coords.append(pred[:, :4].squeeze().tolist())
-        
-        return ious, sum(ious) / image_tensor.shape[0], pred_coords
-            
-  
 
-    def non_max_suppression(self, prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False, max_det=300,
-                        labels=()):
-        
+        return ious, sum(ious) / image_tensor.shape[0], pred_coords
+
+    def non_max_suppression(
+        self,
+        prediction,
+        conf_thres=0.25,
+        iou_thres=0.45,
+        classes=None,
+        agnostic=False,
+        multi_label=False,
+        max_det=300,
+        labels=(),
+    ):
+
         """Runs Non-Maximum Suppression (NMS) on inference results
 
         Returns:
@@ -142,8 +154,10 @@ class YOLOWrapper(nn.Module):
 
             # Compute conf
             if nc == 1:
-                x[:, 5:] = x[:, 4:5] # for models with one class, cls_loss is 0 and cls_conf is always 0.5,
-                                    # so there is no need to multiplicate.
+                x[:, 5:] = x[
+                    :, 4:5
+                ]  # for models with one class, cls_loss is 0 and cls_conf is always 0.5,
+                # so there is no need to multiplicate.
             else:
                 x[:, 5:] *= x[:, 4:5]  # conf = obj_conf * cls_conf
 
@@ -179,22 +193,22 @@ class YOLOWrapper(nn.Module):
             i = torchvision.ops.nms(boxes, scores, iou_thres)  # NMS
             if i.shape[0] > max_det:  # limit detections
                 i = i[:max_det]
-            if merge and (1 < n < 3E3):  # Merge NMS (boxes merged using weighted mean)
+            if merge and (1 < n < 3e3):  # Merge NMS (boxes merged using weighted mean)
                 # update boxes as boxes(i,4) = weights(i,n) * boxes(n,4)
                 iou = self.box_iou(boxes[i], boxes) > iou_thres  # iou matrix
                 weights = iou * scores[None]  # box weights
-                x[i, :4] = torch.mm(weights, x[:, :4]).float() / weights.sum(1, keepdim=True)  # merged boxes
+                x[i, :4] = torch.mm(weights, x[:, :4]).float() / weights.sum(
+                    1, keepdim=True
+                )  # merged boxes
                 if redundant:
                     i = i[iou.sum(1) > 1]  # require redundancy
 
             output[xi] = x[i]
             if (time.time() - t) > time_limit:
-                print(f'WARNING: NMS time limit {time_limit}s exceeded')
+                print(f"WARNING: NMS time limit {time_limit}s exceeded")
                 break  # time limit exceeded
-        
-        
-        return output
 
+        return output
 
     @staticmethod
     def box_iou(box1, box2):
@@ -219,8 +233,17 @@ class YOLOWrapper(nn.Module):
         area2 = box_area(box2.T)
 
         # inter(N,M) = (rb(N,M,2) - lt(N,M,2)).clamp(0).prod(2)
-        inter = (torch.min(box1[:, None, 2:], box2[:, 2:]) - torch.max(box1[:, None, :2], box2[:, :2])).clamp(0).prod(2)
-        return inter / (area1[:, None] + area2 - inter)  # iou = inter / (area1 + area2 - inter)
+        inter = (
+            (
+                torch.min(box1[:, None, 2:], box2[:, 2:])
+                - torch.max(box1[:, None, :2], box2[:, :2])
+            )
+            .clamp(0)
+            .prod(2)
+        )
+        return inter / (
+            area1[:, None] + area2 - inter
+        )  # iou = inter / (area1 + area2 - inter)
 
     @staticmethod
     def xywh2xyxy(x):
@@ -231,12 +254,17 @@ class YOLOWrapper(nn.Module):
         y[:, 2] = x[:, 0] + x[:, 2] / 2  # bottom right x
         y[:, 3] = x[:, 1] + x[:, 3] / 2  # bottom right y
         return y
-    
+
     def scale_coords(self, img1_shape, coords, img0_shape, ratio_pad=None):
-            # Rescale coords (xyxy) from img1_shape to img0_shape
+        # Rescale coords (xyxy) from img1_shape to img0_shape
         if ratio_pad is None:  # calculate from img0_shape
-            gain = min(img1_shape[0] / img0_shape[0], img1_shape[1] / img0_shape[1])  # gain  = old / new
-            pad = (img1_shape[1] - img0_shape[1] * gain) / 2, (img1_shape[0] - img0_shape[0] * gain) / 2  # wh padding
+            gain = min(
+                img1_shape[0] / img0_shape[0], img1_shape[1] / img0_shape[1]
+            )  # gain  = old / new
+            pad = (
+                (img1_shape[1] - img0_shape[1] * gain) / 2,
+                (img1_shape[0] - img0_shape[0] * gain) / 2,
+            )  # wh padding
         else:
             gain = ratio_pad[0][0]
             pad = ratio_pad[1]

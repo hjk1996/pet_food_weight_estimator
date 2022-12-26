@@ -14,7 +14,9 @@ class RMSELoss(nn.Module):
 
 
 class MultiTaskLossWrapper(nn.Module):
-    def __init__(self, classification: bool = True, alpha: float = 0.8, beta: float = 200):
+    def __init__(
+        self, classification: bool = True, alpha: float = 0.8, beta: float = 200
+    ):
         super(MultiTaskLossWrapper, self).__init__()
         self.weight_loss_fn = RMSELoss()
         self.class_loss_fn = nn.BCEWithLogitsLoss(reduction="mean")

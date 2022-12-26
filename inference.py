@@ -10,7 +10,6 @@ from utils import (
     load_image_as_tensor,
     get_class_prediction_from_logit,
     InferenceConfig,
-
 )
 
 from models.model_loader import make_model
@@ -40,7 +39,6 @@ def inference_on_one_image(
     sample = torch.zeros_like(img).to(device)
     _, _ = model(sample)
 
-
     start = time.time()
     weight, class_logit = model(img)
     weight = round(weight.item())
@@ -57,7 +55,12 @@ def inference_on_one_image(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config_path", type=str, default='./inference_config.json', help="예측 설정 json 파일의 경로")
+    parser.add_argument(
+        "--config_path",
+        type=str,
+        default="./inference_config.json",
+        help="예측 설정 json 파일의 경로",
+    )
     parser.add_argument("--img_path", type=str, required=True, help="예측할 이미지의 경로")
     parser.add_argument(
         "--resize",
@@ -68,10 +71,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    
-    with open(args.config_path, 'r') as f:
+    with open(args.config_path, "r") as f:
         infer_config = InferenceConfig.from_json(json.load(f))
-
 
     results = inference_on_one_image(
         model_name=infer_config.model_name,

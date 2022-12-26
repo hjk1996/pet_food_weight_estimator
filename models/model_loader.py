@@ -7,6 +7,7 @@ import torch.nn as nn
 from models.model import Model
 from models.adaptors import adaptor_mapper
 
+
 @dataclass
 class ModelConfig:
     name: str
@@ -23,15 +24,23 @@ class ModelConfig:
 
 
 def load_model_config(model_name: str) -> ModelConfig:
-    with open('model_configs.json', 'r') as f:
+    with open("model_configs.json", "r") as f:
         return ModelConfig.from_json(json.load(f)[model_name])
 
-def make_model(model_name: str, num_classes: int, hidden_size: int = 512 ) -> nn.Module:
+
+def make_model(model_name: str, num_classes: int, hidden_size: int = 512) -> nn.Module:
     config = load_model_config(model_name)
     adatpor_class = adaptor_mapper.get(config.name, None)
     if adatpor_class is None:
         raise ValueError(f"adaptor for {config.name} is not defined.")
-    adatpor = adatpor_class(feature_out_size=config.feature_out_size, hidden_size=hidden_size)
+    adatpor = adatpor_class(
+        feature_out_size=config.feature_out_size, hidden_size=hidden_size
+    )
     return nn.DataParallel(
-         Model(backbone=config.name, adaptor=adatpor,  num_classes=num_classes, hidden_size=hidden_size)
+        Model(
+            backbone=config.name,
+            adaptor=adatpor,
+            num_classes=num_classes,
+            hidden_size=hidden_size,
+        )
     )

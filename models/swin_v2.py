@@ -23,19 +23,16 @@ class SwinV2BasedEstimator(nn.Module):
             self._make_adaptor_linear_block(),
             self._make_linear_block(),
             self._make_last_linear_block(out_features=1),
-            nn.ReLU()
+            nn.ReLU(),
         )
 
         self.classifier = nn.Sequential(
             self._make_adaptor_linear_block(),
             self._make_linear_block(),
-            self._make_last_linear_block(out_features=num_classes)
+            self._make_last_linear_block(out_features=num_classes),
         )
 
         self.droupout = nn.Dropout(p=0.2)
-
-
-
 
     def _make_adaptor_linear_block(self) -> nn.modules.container.Sequential:
         return nn.Sequential(
@@ -59,24 +56,20 @@ class SwinV2BasedEstimator(nn.Module):
     def _make_last_linear_block(
         self, out_features: int
     ) -> nn.modules.container.Sequential:
-        return nn.Linear(
-            in_features=self.linear_hidden_size, out_features=out_features
-        )
-    
-        
+        return nn.Linear(in_features=self.linear_hidden_size, out_features=out_features)
+
     def forward_feature(self, x: Tensor) -> Tensor:
         feature_map = self.backbone.forward_features(x)
         feature_map = feature_map.mean(1)
         feature_map = self.droupout(feature_map)
         return feature_map
 
-
     def forward(self, x) -> Tuple[Tensor, Tensor]:
-        '''
+        """
             return:
                 weight [batch_size, 1]
                 class_logit [batch_size,  n_classes]
-        '''
+        """
         feature_map = self.forward_feature(x)
         weight = self.estimator(feature_map)
         class_logit = self.classifier(feature_map)
