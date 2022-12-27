@@ -1,0 +1,6 @@
+train: ./data/sm/yolo_data/train
+val: ./data/sm/yolo_data/test
+
+nc: 1
+
+names: ['bowl']

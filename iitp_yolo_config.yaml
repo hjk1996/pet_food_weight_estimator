@@ -1,0 +1,6 @@
+train: ./data/iitp/yolo_data/train
+val: ./data/iitp/yolo_data/test
+
+nc: 1
+
+names: ['bowl']
