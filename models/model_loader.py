@@ -36,11 +36,9 @@ def make_model(model_name: str, num_classes: int, hidden_size: int = 512) -> nn.
     adatpor = adatpor_class(
         feature_out_size=config.feature_out_size, hidden_size=hidden_size
     )
-    return nn.DataParallel(
-        Model(
+    return Model(
             backbone=config.name,
             adaptor=adatpor,
             num_classes=num_classes,
             hidden_size=hidden_size,
         )
-    )
