@@ -62,7 +62,7 @@ def validate_one_epoch(
     writer: SummaryWriter,
     loss_fn: MultiTaskLossWrapper,
     device: torch.device,
-) -> Tuple[float, float]:
+) -> Tuple[float, float, float]:
 
     running_loss = 0.0
     running_rmse = 0.0
@@ -102,7 +102,7 @@ def validate_one_epoch(
     writer.add_scalar("Valid/acc", epoch_acc, epoch)
     writer.add_scalar("Valid/f1", epoch_f1, epoch)
 
-    return epoch_rmse, epoch_acc
+    return epoch_rmse, epoch_acc, epoch_f1
 
 
 def train_and_valid(
@@ -113,6 +113,8 @@ def train_and_valid(
     save_path: str,
     target_rmse: float = 0.0,
     targer_acc: float = 1.0,
+    targer_f1: float = 1.0,
+
 ) -> pd.DataFrame:
     loss_fn = MultiTaskLossWrapper(classification=True)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
@@ -126,6 +128,7 @@ def train_and_valid(
 
     rmse_logs = []
     acc_logs = []
+    f1_logs = []
 
     for i in range(n_epochs):
         start = time.time()
@@ -147,7 +150,7 @@ def train_and_valid(
 
             else:
                 model.eval()
-                epoch_rmse, epoch_acc = validate_one_epoch(
+                epoch_rmse, epoch_acc, epoch_f1 = validate_one_epoch(
                     epoch=i,
                     model=model,
                     dataloader=dataloader,
@@ -157,13 +160,14 @@ def train_and_valid(
                 )
                 rmse_logs.append(epoch_rmse)
                 acc_logs.append(epoch_acc)
+                f1_logs.append(epoch_f1)
 
                 if epoch_rmse < best_rmse:
                     best_rmse = epoch_rmse
                     best_weights = model.state_dict()
                     save_model_weights(model.state_dict(), save_path, best=True)
 
-                if epoch_rmse < target_rmse and epoch_acc > targer_acc:
+                if epoch_rmse < target_rmse and epoch_acc > targer_acc and epoch_f1 > targer_f1:
                     save_model_weights(model.state_dict(), save_path, best=False)
                     print("Early Stopping at epoch", i, "\n")
                     return writer
@@ -173,7 +177,7 @@ def train_and_valid(
 
     writer.close()
     df = pd.DataFrame(
-        {"epoch": list(range(len(rmse_logs))), "rmse": rmse_logs, "acc": acc_logs}
+        {"epoch": list(range(len(rmse_logs))), "rmse": rmse_logs, "acc": acc_logs, "f1": f1_logs}
     )
     save_model_weights(best_weights, save_path, best=False)
 
@@ -251,5 +255,6 @@ if __name__ == "__main__":
         save_path=train_config.save_path,
         target_rmse=train_config.target_rmse,
         targer_acc=train_config.target_acc,
+        targer_f1=train_config.target_f1,
         device=device,
     )

@@ -1,0 +1,19 @@
+{
+    "epoch": 300,
+    "batch_size": 128,
+    "test_size": 0.1,
+    "model_name": "efficientnetv2_s",
+    "num_classes": 21,
+    "on_memory": false,
+    "image_folder_path": "./data/sm/256x256",
+    "image_meta_data_path": "./data/sm/image_meta_data.csv",
+    "weight_path": null,
+    "save_path": "./results/iitp",
+    "num_workers": 8,
+    "cropper_weight_path": null,
+    "cropper_input_size": null,
+    "cropper_output_size": null,
+    "target_rmse": 10,
+    "target_acc": 0.9,
+    "target_f1": 0.9
+  }

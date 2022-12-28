@@ -27,14 +27,12 @@ class YOLODataset(Dataset):
         self,
         img_dir: str,
         label_dir: str,
-        device: torch.device,
         on_memory: bool = False,
     ):
         self.img_dir = glob(os.path.join(img_dir, "*.jpg"))
         self.label_dir = label_dir
         self.get_coords()
         self.on_memory = on_memory
-        self.device = device
 
     def __len__(self):
         return len(self.img_dir)

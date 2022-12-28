@@ -72,17 +72,22 @@ if __name__ == "__main__":
         model = make_model(
             model_name=train_config.model_name, num_classes=train_config.num_classes
         ).to(device)
+
         df = train_and_valid(
             model=model,
             dataloaders=dataloaders,
             n_epochs=train_config.epoch,
             save_path=train_config.save_path,
             device=device,
+            target_rmse=train_config.target_rmse,
+            targer_acc=train_config.target_acc,
+            targer_f1=train_config.target_f1,
         )
         dfs.append(df)
 
     lowest_rmse = list(map(lambda x: x["rmse"].min(), dfs))
     highest_acc = list(map(lambda x: x["acc"].max(), dfs))
+    highest_f1 = list(map(lambda x: x["f1"].max(), dfs))
 
     cv10_log_folder_path = os.path.join(train_config.save_path, "cv10_log")
     os.makedirs(cv10_log_folder_path, exist_ok=True)
@@ -95,8 +100,10 @@ if __name__ == "__main__":
             "fold": [i + 1 for i in range(len(lowest_rmse))],
             "lowest_rmse": lowest_rmse,
             "highest_acc": highest_acc,
+            "highest_f1": highest_f1,
             "mean_rmse": [np.mean(lowest_rmse)] * len(lowest_rmse),
             "mean_acc": [np.mean(highest_acc)] * len(highest_acc),
+            "mean_f1": [np.mean(highest_f1)] * len(highest_f1),
         }
     )
 

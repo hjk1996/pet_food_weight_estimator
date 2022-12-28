@@ -1,6 +1,7 @@
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict, List
 import torch
 import torch.nn as nn
+from torch import Tensor
 import time
 import numpy as np
 from yolov7.yolo_models.experimental import attempt_load
@@ -53,6 +54,36 @@ class YOLOWrapper(nn.Module):
                     has_bowl[i, 0] = True
 
         return images, has_bowl
+
+    def get_xywh_coords(self, image_id: List[str],  image_tensor: torch.tensor) -> Dict[str, List]:
+        """
+        input:
+
+            image_id: [batch_size]
+            image_tensor: [batch_size, 3, width, hegiht]
+
+        output:
+
+            coords dict: {image_id: [x-center, y-center, w, h]}. coords are scaled to [0,1]
+        """
+        assert image_tensor.shape[0] == len(image_id)
+
+        with torch.no_grad():
+            preds, _ = self.model(image_tensor)
+            preds = self.non_max_suppression(preds, max_det=1)
+            # preds는 각 배치에 대한 예측 결과를 담은 리스트임
+            # 즉, preds의 length는 배치 사이즈와 같음.
+            coords = {}
+
+            for i, pred in enumerate(preds):
+                if pred.shape[0] == 0:
+                    coords[image_id[i]] = [0, 0, 0, 0]
+                else:
+                    self.clip_coords(pred[:, :4], (self.img_size, self.img_size))
+                    coords[image_id[i]] = list(map(lambda x: round(x / self.img_size, 6), self.xyxy2xywh(pred[:, :4]).squeeze().tolist()))
+
+        return coords
+
 
     def get_miou(
         self, image_tensor: torch.tensor, box_coords: torch.tensor
@@ -246,7 +277,19 @@ class YOLOWrapper(nn.Module):
         )  # iou = inter / (area1 + area2 - inter)
 
     @staticmethod
-    def xywh2xyxy(x):
+    def xyxy2xywh(x: Tensor) -> Tensor:
+        # convert nx4 boxes from [x1, y1, x2, y2] to [x-center, y-center, w, h]
+        y = x.clone() if isinstance(x, torch.Tensor) else np.copy(x)
+        y[:, 0] = (x[:, 0] + x[:, 2]) / 2  # x center
+        y[:, 1] = (x[:, 1] + x[:, 3]) / 2  # y center
+        y[:, 2] = (x[:, 2] - x[:, 0])  # width
+        y[:, 3] = (x[:, 3] - x[:, 1])  # height
+        return y
+
+
+
+    @staticmethod
+    def xywh2xyxy(x: Tensor) -> Tensor:
         # Convert nx4 boxes from [x, y, w, h] to [x1, y1, x2, y2] where xy1=top-left, xy2=bottom-right
         y = x.clone() if isinstance(x, torch.Tensor) else np.copy(x)
         y[:, 0] = x[:, 0] - x[:, 2] / 2  # top left x
