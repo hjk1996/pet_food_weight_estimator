@@ -85,6 +85,7 @@ if __name__ == "__main__":
         )
         dfs.append(df)
 
+
     lowest_rmse = list(map(lambda x: x["rmse"].min(), dfs))
     highest_acc = list(map(lambda x: x["acc"].max(), dfs))
     highest_f1 = list(map(lambda x: x["f1"].max(), dfs))
