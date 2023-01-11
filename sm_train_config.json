@@ -14,6 +14,6 @@
     "cropper_input_size": null,
     "cropper_output_size": null,
     "target_rmse": 10,
-    "target_acc": 0.9,
+    "target_acc": 0.0,
     "target_f1": 0.9
   }
