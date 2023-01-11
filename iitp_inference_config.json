@@ -1,0 +1,6 @@
+{
+  "weight_path": null,
+  "model_name": "efficientnetv2_s",
+  "num_classes": 10,
+  "mapping_path": null
+}

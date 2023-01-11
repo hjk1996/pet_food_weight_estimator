@@ -18,8 +18,8 @@ from models.model_loader import make_model
 def inference_on_one_image(
     model_name: str,
     image_path: str,
-    weight_path: str,
     num_classes: int,
+    weight_path: str = None,
     mapping_path: str = None,
     resize: int = None,
 ) -> Union[tuple, int]:
@@ -27,13 +27,18 @@ def inference_on_one_image(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     img = load_image_as_tensor(image_path, resize=resize).to(device)
     model = make_model(model_name=model_name, num_classes=num_classes).to(device)
-    model.load_state_dict(torch.load(weight_path))
-    model.eval()
+    
+    
+    if weight_path:   
+        model.load_state_dict(torch.load(weight_path))
 
     indice_to_name = None
     if mapping_path:
         with open(mapping_path, "r") as f:
             indice_to_name = json.load(f)
+
+    model.eval()
+
 
     # warm up
     sample = torch.zeros_like(img).to(device)
