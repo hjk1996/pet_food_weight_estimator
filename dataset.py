@@ -95,6 +95,86 @@ class YOLODataset(Dataset):
                 )
 
 
+class DogFoodDataset(Dataset):
+    def __init__(
+        self,
+        meta_data: pd.DataFrame,
+        img_dir: str,
+        n_classes: int,
+        on_memory: bool = False,
+        cropper: nn.Module = None,
+        transform=None,
+    ):
+        self.meta_data = meta_data
+        self.img_dir = img_dir
+        self.transform = transform
+        self.n_classes = n_classes
+        self.on_memory = on_memory
+        self.cropper = cropper
+
+        if on_memory:
+            self._load_image_on_memory()
+
+    def _load_image_on_memory(self) -> None:
+        self.img_tensors = []
+        self.food_type_tensors = []
+        self.gram_tensors = []
+
+        for i in range(len(self.meta_data)):
+            img_tensor = (
+                read_image(
+                    os.path.join(self.img_dir, self.meta_data.iloc[i, 3])
+                ).float()
+            )
+            self.img_tensors.append(img_tensor)
+
+            food_type_tensor = torch.zeros(self.n_classes).type(torch.FloatTensor)
+            food_type_tensor[
+                list(map(int, str(self.meta_data.iloc[i, 1]).split()))
+            ] = 1.0
+            self.food_type_tensors.append(food_type_tensor)
+
+            gram_tensor = torch.tensor([self.meta_data.iloc[i, 2]]).type(
+                torch.FloatTensor
+            )
+            self.gram_tensors.append(gram_tensor)
+
+    def __len__(self):
+        return len(self.meta_data)
+
+    def __getitem__(self, idx):
+        """
+        return: gram, food_type, image
+        """
+
+        if self.on_memory:
+            gram = self.gram_tensors[idx].clone().detach()
+            food_type = self.food_type_tensors[idx].clone().detach()
+            img = self.img_tensors[idx].clone().detach()
+
+        else:
+            gram = torch.tensor([self.meta_data.iloc[idx, 2]]).type(torch.FloatTensor)
+            food_type = torch.zeros(self.n_classes).type(torch.FloatTensor)
+            food_type[list(map(int, str(self.meta_data.iloc[idx, 1]).split()))] = 1.0
+            img_path = os.path.join(self.img_dir, self.meta_data.iloc[idx, 3])
+            img = read_image(img_path)
+
+        if self.cropper:
+            # cropper인 yolov7은 4차원의 입력을 받음 [batch_size, rgb, width, height]
+            # 또한 입력값은 0과 1사이의 값으로 정규화된 float tensor임.
+            # 따라서 cropping을 위해서 임시적으로 batch 차원을 추가해줘야함.
+            img = img.float() / 255
+            img = self.cropper(img.unsqueeze(0))[0].squeeze()
+            img = torch.clamp((img * 255), min=0, max=255).type(torch.uint8)
+
+        if self.transform:
+            # transform은 uint8(0~255) type의 텐서만 입력으로 받을 수 있음.
+            img = self.transform(img)
+
+        img = img.float() / 255
+
+        return gram, food_type, img
+
 
 class ImageDataset(Dataset):
     def __init__(
