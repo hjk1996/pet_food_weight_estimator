@@ -14,6 +14,7 @@ from augmentation import kim_aug
 from models.model_loader import make_model
 
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -104,7 +105,7 @@ if __name__ == "__main__":
             "highest_f1": highest_f1,
             "mean_rmse": [np.mean(lowest_rmse)] * len(lowest_rmse),
             "mean_acc": [np.mean(highest_acc)] * len(highest_acc),
-            "mean_f1": [np.mean(highest_f1)] * len(highest_f1),
+            "mean_f1": [np.mean(highest_f1)] * len(highest_f1)
         }
     )
 
