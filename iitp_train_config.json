@@ -1,6 +1,6 @@
 {
   "epoch": 300,
-  "batch_size": 128,
+  "batch_size": 32,
   "test_size": 0.1,
   "model_name": "efficientnetv2_s",
   "num_classes": 10,
@@ -15,5 +15,5 @@
   "cropper_output_size": null,
   "target_rmse": 5,
   "target_acc": 0.9,
-  "target_f1": 0.0
+  "target_f1": 0.9
 }

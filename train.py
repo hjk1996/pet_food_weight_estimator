@@ -179,6 +179,7 @@ def train_and_valid(
     df = pd.DataFrame(
         {"epoch": list(range(len(rmse_logs))), "rmse": rmse_logs, "acc": acc_logs, "f1": f1_logs}
     )
+    df.to_csv(os.path.join(save_path, "log.csv"), index=False)
     save_model_weights(best_weights, save_path, best=False)
 
     return df
