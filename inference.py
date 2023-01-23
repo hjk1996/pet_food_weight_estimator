@@ -27,9 +27,8 @@ def inference_on_one_image(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     img = load_image_as_tensor(image_path, resize=resize).to(device)
     model = make_model(model_name=model_name, num_classes=num_classes).to(device)
-    
-    
-    if weight_path:   
+
+    if weight_path:
         model.load_state_dict(torch.load(weight_path))
 
     indice_to_name = None
@@ -38,7 +37,6 @@ def inference_on_one_image(
             indice_to_name = json.load(f)
 
     model.eval()
-
 
     # warm up
     sample = torch.zeros_like(img).to(device)

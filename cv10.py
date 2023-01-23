@@ -1,6 +1,7 @@
 import json
 import os
 import argparse
+from typing import List
 
 import numpy as np
 import torch
@@ -68,7 +69,7 @@ if __name__ == "__main__":
             test_mode=args.test_mode,
         )
 
-    dfs = []
+    dfs: List[pd.DataFrame] = []
     for dataloaders in dataset_list:
         model = make_model(
             model_name=train_config.model_name, num_classes=train_config.num_classes
@@ -87,9 +88,9 @@ if __name__ == "__main__":
         dfs.append(df)
 
 
-    lowest_rmse = list(map(lambda x: x["rmse"].min(), dfs))
-    highest_acc = list(map(lambda x: x["acc"].max(), dfs))
-    highest_f1 = list(map(lambda x: x["f1"].max(), dfs))
+    lowest_rmse = list(map(lambda x: x.loc["rmse"].min(), dfs))
+    highest_acc = list(map(lambda x: x.loc["acc"].max(), dfs))
+    highest_f1 = list(map(lambda x: x.loc["f1"].max(), dfs))
 
     cv10_log_folder_path = os.path.join(train_config.save_path, "cv10_log")
     os.makedirs(cv10_log_folder_path, exist_ok=True)
