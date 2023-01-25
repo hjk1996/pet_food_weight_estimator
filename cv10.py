@@ -2,6 +2,7 @@ import json
 import os
 import argparse
 from typing import List
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -28,6 +29,7 @@ if __name__ == "__main__":
         "--device", type=str, default="cuda",
     )
     parser.add_argument("--test_mode", action="store_true")
+    parser.add_argument("--start_fold", type=int, default=0)
     args = parser.parse_args()
 
     with open(args.config_path, "r") as f:
@@ -69,8 +71,16 @@ if __name__ == "__main__":
             test_mode=args.test_mode,
         )
 
-    dfs: List[pd.DataFrame] = []
-    for dataloaders in dataset_list:
+    folds = []
+    lowest_rmses = []
+    highest_accs = []
+    highest_f1s = []
+
+
+    for fold, dataloaders in enumerate(dataset_list):
+        if fold < args.start_fold:
+            continue
+
         model = make_model(
             model_name=train_config.model_name, num_classes=train_config.num_classes
         ).to(device)
@@ -85,29 +95,30 @@ if __name__ == "__main__":
             targer_acc=train_config.target_acc,
             targer_f1=train_config.target_f1,
         )
-        dfs.append(df)
+        folds.append(fold)
+        lowest_rmses.append(df["rmse"].min())
+        highest_accs.append(df["acc"].max())
+        highest_f1s.append(df["f1"].max())
 
-
-    lowest_rmse = list(map(lambda x: x.loc["rmse"].min(), dfs))
-    highest_acc = list(map(lambda x: x.loc["acc"].max(), dfs))
-    highest_f1 = list(map(lambda x: x.loc["f1"].max(), dfs))
-
-    cv10_log_folder_path = os.path.join(train_config.save_path, "cv10_log")
-    os.makedirs(cv10_log_folder_path, exist_ok=True)
-
-    for i, df in enumerate(dfs):
-        df.to_csv(os.path.join(cv10_log_folder_path, f"fold_{i+1}.csv"), index=False)
-
-    df = pd.DataFrame(
+    cv10_summary = pd.DataFrame(
         {
-            "fold": [i + 1 for i in range(len(lowest_rmse))],
-            "lowest_rmse": lowest_rmse,
-            "highest_acc": highest_acc,
-            "highest_f1": highest_f1,
-            "mean_rmse": [np.mean(lowest_rmse)] * len(lowest_rmse),
-            "mean_acc": [np.mean(highest_acc)] * len(highest_acc),
-            "mean_f1": [np.mean(highest_f1)] * len(highest_f1)
+            "fold": folds,
+            "lowest_rmse": lowest_rmses,
+            "highest_acc": highest_accs,
+            "highest_f1": highest_f1s,
+            "mean_lowest_rmse": np.mean(lowest_rmses) * len(folds),
+            "mean_highest_acc": np.mean(highest_accs) * len(folds),
+            "mean_highest_f1": np.mean(highest_f1s) * len(folds),
         }
     )
 
-    df.to_csv(os.path.join(cv10_log_folder_path, "cv10_summary.csv"), index=False)
+
+    cv10_log_folder_path = os.path.join(train_config.save_path, "cv10_log")
+    os.makedirs(cv10_log_folder_path, exist_ok=True)
+    cv10_summary.to_csv(os.path.join(cv10_log_folder_path, "cv10_summary.csv"), index=False)
+    end_time = datetime.now()
+    print(f"cv10.py finished at {end_time}")
+
+
+
+

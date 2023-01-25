@@ -182,6 +182,9 @@ def train_and_valid(
     df.to_csv(os.path.join(save_path, "log.csv"), index=False)
     save_model_weights(best_weights, save_path, best=False)
 
+    end_time = datetime.now()
+    print("Training finished at", end_time)
+
     return df
 
 

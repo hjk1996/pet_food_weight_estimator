@@ -1,5 +1,5 @@
 {
-  "weight_path": null,
+  "weight_path": "./weights/sm/best.pt",
   "model_name": "efficientnetv2_s",
   "num_classes": 21,
   "mapping_path": null

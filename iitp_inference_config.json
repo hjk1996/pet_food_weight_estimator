@@ -1,5 +1,5 @@
 {
-  "weight_path": null,
+  "weight_path": "./weights/iitp/best.pt",
   "model_name": "efficientnetv2_s",
   "num_classes": 10,
   "mapping_path": null
