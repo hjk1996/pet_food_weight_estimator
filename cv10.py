@@ -29,9 +29,9 @@ def summarize_results(src: str, dst: str) -> None:
     for path in paths:
         df = pd.read_csv(path)
         log_name.append(path.split("/")[-1])
-        highest_accs.append(df["val_acc"].max())
-        highest_f1s.append(df["val_f1"].max())
-        lowest_rmses.append(df["val_rmse"].min())
+        highest_accs.append(df["acc"].max())
+        highest_f1s.append(df["f1"].max())
+        lowest_rmses.append(df["rmse"].min())
 
     mean_highest_acc = np.mean(highest_accs)
     mean_highest_f1 = np.mean(highest_f1s)
