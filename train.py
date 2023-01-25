@@ -131,6 +131,7 @@ def train_and_valid(
     f1_logs = []
 
     for i in range(n_epochs):
+        early_stop = False
         start = time.time()
         for phase in ["train", "test"]:
 
@@ -170,7 +171,11 @@ def train_and_valid(
                 if epoch_rmse < target_rmse and epoch_acc > targer_acc and epoch_f1 > targer_f1:
                     save_model_weights(model.state_dict(), save_path, best=False)
                     print("Early Stopping at epoch", i, "\n")
-                    return writer
+                    early_stop = True
+                    break
+            
+        if early_stop:
+            break
 
         end = time.time()
         print(f"EPOCH[{i}] took {end - start:.2f} seconds", "\n")
