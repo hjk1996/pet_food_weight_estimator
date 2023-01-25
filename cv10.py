@@ -106,9 +106,9 @@ if __name__ == "__main__":
             "lowest_rmse": lowest_rmses,
             "highest_acc": highest_accs,
             "highest_f1": highest_f1s,
-            "mean_lowest_rmse": np.mean(lowest_rmses) * len(folds),
-            "mean_highest_acc": np.mean(highest_accs) * len(folds),
-            "mean_highest_f1": np.mean(highest_f1s) * len(folds),
+            "mean_lowest_rmse": np.mean(lowest_rmses) ,
+            "mean_highest_acc": np.mean(highest_accs) ,
+            "mean_highest_f1": np.mean(highest_f1s) ,
         }
     )
 
