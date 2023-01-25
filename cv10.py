@@ -43,9 +43,9 @@ def summarize_results(src: str, dst: str) -> None:
             "highest_acc": highest_accs,
             "highest_f1": highest_f1s,
             "lowest_rmse": lowest_rmses,
-            "mean_highest_acc": [mean_highest_acc],
-            "mean_highest_f1": [mean_highest_f1],
-            "mean_lowest_rmse": [mean_lowest_rmse],
+            "mean_highest_acc": [mean_highest_acc] * len(log_name),
+            "mean_highest_f1": [mean_highest_f1] * len(log_name),
+            "mean_lowest_rmse": [mean_lowest_rmse] * len(log_name),
         }
     )
     summary.to_csv(dst, index=False)
