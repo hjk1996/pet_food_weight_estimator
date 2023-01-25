@@ -108,6 +108,7 @@ if __name__ == "__main__":
         )
 
     cv10_log_path = os.path.join(train_config.save_path, "cv10_log")
+    os.makedirs(cv10_log_path, exist_ok=True)
     for fold, dataloaders in enumerate(dataset_list):
         if fold < args.start_fold:
             continue
